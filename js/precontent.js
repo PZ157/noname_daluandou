@@ -1,6 +1,26 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js'
 
 export function precontent(config, pack) {
+	{
+		let min = [14],
+			noname = lib.version.split('.').slice(2).map(i => {
+				return Number(i);
+			}),
+			len = Math.min(noname.length, min.length),
+			status = false;
+		if (lib.version.slice(0, 5) === '1.10.') for (let i = 0; i < len; i++) {
+			if (noname[i] < min[i]) {
+				status = '您的无名杀版本太低';
+				break;
+			}
+		}
+		else status = '检测到游戏大版本号与本扩展支持版本号不同';
+		if (typeof status === 'string') {
+			alert(status + '，为避免版本不兼容产生不必要的问题，已为您关闭《大乱斗》扩展，稍后重启游戏');
+			game.saveExtensionConfig('大乱斗', 'enable', false);
+			game.reload();
+		}
+	}
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
 			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>24</font>日</center>',

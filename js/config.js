@@ -68,6 +68,23 @@ export let config = {
 			}
 		}
 	},
+	github: {
+		name: '<font color=#FF9244>点我复制本扩展GitHub仓库链接</font>',
+		clear: true,
+		onclick: function () {
+			let textarea = document.createElement('textarea');
+			textarea.setAttribute('readonly', 'readonly');
+			textarea.value = 'https://github.com/PZ157/noname_daluandou';
+			document.body.appendChild(textarea);
+			textarea.select();
+			if (document.execCommand('copy')) {
+				document.execCommand('copy');
+				alert('已成功复制到剪切板。国内访问不稳定，可能需要代理');
+			}
+			else alert('复制失败，请稍后重试');
+			document.body.removeChild(textarea);
+		}
+	},
 	tip: {
 		clear: true,
 		name: '<hr><center><font color=#00FFB0>以下部分选项长按有提示</font>！</center>'
