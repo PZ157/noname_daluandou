@@ -3,15 +3,15 @@ import { lib, game, ui, get, ai, _status } from '../../../noname.js'
 export function precontent(config, pack) {
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
-			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>23</font>日</center>',
+			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>24</font>日</center>',
 			'★<font color=#FF0000>注意！</font>此版本改动幅度极大，请自行检查配置状态',
 			'◆新增功能［开局执行函数］［技能审批］',
-			'◆重置部分配置',
-			'◆将部分功能集成到［开局执行函数］内',
+			'◆删除势力技、国战、预制技能池相关功能',
+			'◆调整部分配置，将部分功能集成到［开局执行函数］内',
 			'◆重置大量代码逻辑',
-			'◆移除势力技和内奸加成③',
+			'◆移除〔刷新大乱斗〕按钮',
 			'◆不再支持国战模式',
-			'◆联机掉线重连改为自动同步配置',
+			'◆联机掉线重连自动同步必要配置',
 			'◆其他细节优化',
 		];
 		let ul = document.createElement('ul');
@@ -277,8 +277,10 @@ export function precontent(config, pack) {
 	});
 	lib.arenaReady.push(function () {
 		if (!Array.isArray(lib.config.extension_大乱斗_check)) game.saveExtensionConfig('大乱斗', 'check', []);
-		if (Object.prototype.toString.call(lib.config.extension_大乱斗_ief) !== '[object AsyncFunction]')
-			game.saveExtensionConfig('大乱斗', 'ief', `func = async function (player, configs) {
+		if (Object.prototype.toString.call(lib.config.extension_大乱斗_ief) !== '[object AsyncFunction]') game.saveExtensionConfig(
+			'大乱斗',
+			'ief',
+			`func = async function (player, configs) {
 	let mode = get.mode(), isZhu = function (current) {
 		if (!current.identityShown || mode !== 'identity' && mode !== 'versus' && mode !== 'doudizhu') return false;
 		return current === game.zhu || current === game.rZhu || current === game.bZhu || current === game.trueZhu || current === game.falseZhu;
@@ -311,7 +313,8 @@ export function precontent(config, pack) {
 			player.storage.dld.tret++;
 		}
 	}
-};`);
+};`
+		);
 		if (!Array.isArray(lib.config.extension_大乱斗_common)) game.saveExtensionConfig('大乱斗', 'common', []);
 		if (!Array.isArray(lib.config.extension_大乱斗_disabled)) game.saveExtensionConfig('大乱斗', 'disabled', []);
 		if (!Array.isArray(lib.config.extension_大乱斗_group)) game.saveExtensionConfig('大乱斗', 'group', []);
@@ -401,12 +404,9 @@ export function precontent(config, pack) {
 			}
 			else if (zhuSkill === 's') _status.daluandou_zhus = {};
 			game.broadcastAll((zhus, allotSkills) => {
-				/*for (let i in allotSkills) {
-					lib.character[i].skills = allotSkills[i].slice(0);
-				}*/
 				lib.skill._dld_start.toLoad({
 					zhus: zhus,
-					allotSkills: _status.daluandou_zhus
+					allotSkills: allotSkills
 				});
 			}, zhus, _status.daluandou_zhus);
 		},
@@ -1133,7 +1133,6 @@ export function precontent(config, pack) {
 				'选择获得至多' + get.cnNumber(max) + '项添头技',
 				[list, 'textbutton']
 			]);
-			next.set('dialog', event.videoId);
 			next.set('ai', function (button) {
 				return get.skillRank(button.link);
 			});

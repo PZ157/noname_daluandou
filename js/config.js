@@ -73,7 +73,7 @@ export let config = {
 		name: '<hr><center><font color=#00FFB0>以下部分选项长按有提示</font>！</center>'
 	},
 	tnsc: {
-		name: '可供候选的技能总数',
+		name: '默认候选技能总数',
 		init: 15,
 		input: true,
 		onblur: function (e) {
@@ -87,7 +87,7 @@ export let config = {
 		}
 	},
 	nsc: {
-		name: '可选技能数',
+		name: '默认可选技能数',
 		init: 2,
 		input: true,
 		onblur: function (e) {
@@ -125,9 +125,11 @@ export let config = {
 		onclick: function () {
 			let container = ui.create.div('.popup-container.editor'),
 				node = container,
-				config = lib.config.extension_大乱斗_ief || `func = async function (player, configs) {
+				config = lib.config.extension_大乱斗_ief ||
+					`func = async function (player, configs) {
 	
-};`;
+};`
+				;
 			node.code = config;
 			ui.window.classList.add('shortcutpaused');
 			ui.window.classList.add('systempaused');
@@ -179,7 +181,7 @@ export let config = {
 		}
 	},
 	nrsc: {
-		name: '可供候选的常驻技能数',
+		name: '默认常驻技能候选数量',
 		init: 5,
 		input: true,
 		onblur: function (e) {
