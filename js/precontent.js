@@ -2,7 +2,7 @@ import { lib, game, ui, get, ai, _status } from '../../../noname.js'
 
 export function precontent(config, pack) {
 	{
-		let min = [14],
+		let min = [15],
 			noname = lib.version.split('.').slice(2).map(i => {
 				return Number(i);
 			}),
@@ -23,16 +23,9 @@ export function precontent(config, pack) {
 	}
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
-			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>24</font>日</center>',
-			'★<font color=#FF0000>注意！</font>此版本改动幅度极大，请自行检查配置状态',
-			'◆新增功能［开局执行函数］［技能审批］',
-			'◆删除势力技、国战、预制技能池相关功能',
-			'◆调整部分配置，将部分功能集成到［开局执行函数］内',
-			'◆重置大量代码逻辑',
-			'◆移除〔刷新大乱斗〕按钮',
-			'◆不再支持国战模式',
-			'◆联机掉线重连自动同步必要配置',
-			'◆其他细节优化',
+			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>25</font>日</center>',
+			'◆修复［技能审批］的一些问题',
+			'◆修正最低支持的本体版本号为1.10.15',
 		];
 		let ul = document.createElement('ul');
 		ul.style.textAlign = 'left';
@@ -1411,6 +1404,7 @@ export function precontent(config, pack) {
 						lib.config['extension_大乱斗_' + name].addArray(result.links);
 						game.saveExtensionConfig('大乱斗', name, lib.config['extension_大乱斗_' + name]);
 						skills.removeArray(result.links);
+						if (!skills.length) break;
 					}
 				}
 			} while (confirm('是否继续批阅？（剩余' + allSkills.length + '项技能未批阅）'));
