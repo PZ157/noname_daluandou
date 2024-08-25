@@ -1394,7 +1394,7 @@ export function precontent(config, pack) {
 								if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation.slice(0);
 								else derivation = [lib.skill[skill].derivation];
 								for (let j of derivation) {
-									str += '<br><span class="thundertext"><b>' + (lib.translate[j] + '[' + skill + ']') + '</b>：' + get.skillInfoTranslation(j, player) + '</span>';
+									str += '<br><span class="thundertext"><b>' + (lib.translate[j] + '[' + j + ']') + '</b>：' + get.skillInfoTranslation(j, player) + '</span>';
 								}
 							}
 							return [skill, str + '</div>'];
