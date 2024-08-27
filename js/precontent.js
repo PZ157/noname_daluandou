@@ -25,7 +25,6 @@ export function precontent(config, pack) {
 		let str = [
 			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>25</font>日</center>',
 			'◆修复［技能审批］的一些问题',
-			'◆修正最低支持的本体版本号为1.10.15',
 		];
 		let ul = document.createElement('ul');
 		ul.style.textAlign = 'left';
@@ -1380,6 +1379,10 @@ export function precontent(config, pack) {
 				disabled: '<font color=#FF0000>禁选技能池</font>',
 				tret: '<font color=#00FF00>添头技能池</font>'
 			};
+			if (!allSkills.length) {
+				alert('当前将池技能已批阅完毕！');
+				return;
+			}
 			do {
 				let skills = allSkills.slice(0, lib.config.extension_大乱斗_filterSkills);
 				allSkills.removeArray(skills);
@@ -1406,6 +1409,10 @@ export function precontent(config, pack) {
 						skills.removeArray(result.links);
 						if (!skills.length) break;
 					}
+				}
+				if (!allSkills.length) {
+					alert('当前将池技能已批阅完毕！');
+					break;
 				}
 			} while (confirm('是否继续批阅？（剩余' + allSkills.length + '项技能未批阅）'));
 			game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
