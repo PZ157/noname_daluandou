@@ -190,18 +190,18 @@ export function precontent(config, pack) {
 				if (!find && skills.length === 2) {
 					if (skills[0] === skills[1]) return show('<div style="color:rgb(255,255,0);font-family:xinwei"><font size="4">输入的俩技能ID相同</font></div>');
 					lists.push(skills);
-					show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将' + (lib.translate[skills[0]] || skills[0]) + '＋' + (lib.translate[skills[1]] || skills[1]) + '加入' + name + '</font></div>');
+					show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将【' + (lib.translate[skills[0]] || skills[0]) + '】＋【' + (lib.translate[skills[1]] || skills[1]) + '】加入' + name + '</font></div>');
 				}
-				else if (skills.length === 1 || skills[0] === skills[1]) show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将' + (lib.translate[skills[0]] || skills[0]) + '相关的技能对移出' + name + '</font></div>');
-				else show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将' + (lib.translate[skills[0]] || skills[0]) + '＋' + (lib.translate[skills[1]] || skills[1]) + '移出' + name + '</font></div>');
+				else if (skills.length === 1 || skills[0] === skills[1]) show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将【' + (lib.translate[skills[0]] || skills[0]) + '】相关的技能对移出' + name + '</font></div>');
+				else show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将【' + (lib.translate[skills[0]] || skills[0]) + '】＋【' + (lib.translate[skills[1]] || skills[1]) + '】移出' + name + '</font></div>');
 			}
 			else if (lists.includes(skills[0])) {
 				lists.remove(skills[0]);
-				show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将' + (lib.translate[skills[0]] || skills[0]) + '移出' + name + '</font></div>');
+				show('<div style="color:rgb(210,210,000);font-family:xinwei"><font size="4">已将【' + (lib.translate[skills[0]] || skills[0]) + '】移出' + name + '</font></div>');
 			}
 			else {
 				lists.push(skills[0]);
-				show('<div style="color:rgb(255,97,3);font-family:xinwei"><font size="4">已将' + (lib.translate[skills[0]] || skills[0]) + '加入' + name + '</font></div>');
+				show('<div style="color:rgb(255,97,3);font-family:xinwei"><font size="4">已将【' + (lib.translate[skills[0]] || skills[0]) + '】加入' + name + '</font></div>');
 			}
 			game.saveExtensionConfig('大乱斗', config, lists);
 		});
