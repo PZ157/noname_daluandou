@@ -23,8 +23,9 @@ export function precontent(config, pack) {
 	}
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
-			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>25</font>日</center>',
-			'◆修复［技能审批］的一些问题',
+			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>27</font>日</center>',
+			'◆常驻候选列表支持同名去重',
+			'◆优化［技能审批］',
 		];
 		let ul = document.createElement('ul');
 		ul.style.textAlign = 'left';
@@ -705,21 +706,38 @@ export function precontent(config, pack) {
 		superCharlotte: true,
 		ruleSkill: true,
 		getSkills(target) {
-			let num = target.storage.dld.tnsc, common = [], skills = [];
-			if (!_status.dld_config.started) {
-				common = _status.daluandou_common.randomGets(lib.config.extension_大乱斗_nrsc);
-				_status.daluandou_common.removeArray(common);
-			}
+			let common = [],
+				skills = [],
+				count,
+				trans = [],
+				trymax;
 			if (get.mode() === 'doudizhu') {
-				if (target === game.zhu && !target.hasSkill('bahu', null, null, false)) common[0] = 'bahu';
+				if (target === game.zhu && !target.hasSkill('bahu', null, null, false)) common.push('bahu');
 			}
-			num -= common.length;
-			let count = num,
-				trans = common.map(i => lib.translate[i] || i),
-				trymax = _status.daluandou_skills.length;
+			if (!_status.dld_config.started) {
+				count = lib.config.extension_大乱斗_nrsc - common.length;
+				trans = common.map(i => lib.translate[i] || i);
+				trymax = _status.daluandou_common.length;
+				while (count--) {
+					let skill = _status.daluandou_common.randomGet();
+					if (!lib.translate[skill] || trans.includes(lib.translate[skill])) {
+						if (--trymax < 0) {
+							game.dldLessAlert();
+							break;
+						}
+						count++;
+						continue;
+					}
+					common.push(skill);
+					trans.push(lib.translate[skill] || skill);
+					_status.daluandou_common.remove(skill);
+				}
+			}
+			count = target.storage.dld.tnsc - common.length;
+			trymax = _status.daluandou_skills.length;
 			while (count--) {
 				let skill = _status.daluandou_skills.randomGet();
-				if (!lib.translate[skill] || trans.includes(lib.translate[skill])) {
+				if (trans.includes(lib.translate[skill])) {
 					if (--trymax < 0) {
 						game.dldLessAlert();
 						break;
@@ -977,12 +995,16 @@ export function precontent(config, pack) {
 		superCharlotte: true,
 		ruleSkill: true,
 		getSkills(target) {
-			let num = lib.config.extension_大乱斗_tretNum, skills = [];
-			if (num[0] === 'x') num = target.storage.dld.tret * Number(num.slice(1));
-			else num = Number(num);
-			let count = num,
+			let num = lib.config.extension_大乱斗_tretNum, count;
+			if (num[0] === 'x') count = target.storage.dld.tret * Number(num.slice(1));
+			else count = Number(num);
+			let skills = [],
 				info = [],
 				trymax = _status.daluandou_tret.length;
+			if (get.mode() === 'doudizhu') {
+				if (target === game.zhu && !target.hasSkill('feiyang', null, null, false)) skills.push('feiyang');
+			}
+			count -= skills.length;
 			while (count--) {
 				let skill = _status.daluandou_tret.randomGet();
 				if (!lib.translate[skill] || info.includes(lib.translate[skill])) {
@@ -996,9 +1018,6 @@ export function precontent(config, pack) {
 				skills.push(skill);
 				info.push(lib.translate[skill] || skill);
 				_status.daluandou_tret.remove(skill);
-			}
-			if (get.mode() === 'doudizhu') {
-				if (target === game.zhu && !target.hasSkill('feiyang', null, null, false)) skills[0] = 'feiyang';
 			}
 			return skills;
 		},
@@ -1384,8 +1403,7 @@ export function precontent(config, pack) {
 				return;
 			}
 			do {
-				let skills = allSkills.slice(0, lib.config.extension_大乱斗_filterSkills);
-				allSkills.removeArray(skills);
+				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
 				lib.config.extension_大乱斗_check.addArray(skills);
 				for (let name of ['common', 'disabled', 'tret']) {
 					let result = await player.chooseButton([
