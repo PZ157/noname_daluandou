@@ -23,9 +23,9 @@ export function precontent(config, pack) {
 	}
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
-			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>27</font>日</center>',
-			'◆常驻候选列表支持同名去重',
-			'◆优化［技能审批］',
+			'<center><font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>28</font>日</center>',
+			'◆玩家选技能后可将不合理技能交由房主下次单机时审批（［技能审批］设0则无此项）',
+			'◆提示内容修复'
 		];
 		let ul = document.createElement('ul');
 		ul.style.textAlign = 'left';
@@ -149,14 +149,14 @@ export function precontent(config, pack) {
 			return skill;
 		}
 	};
-	game.dldLessAlert = () => {
+	game.dldLessAlert = (str) => {
 		if (_status.dld_less) return;
+		if (str) {
+			alert(str);
+			return;
+		}
 		let tnsc = lib.config.extension_大乱斗_tnsc, nsc = lib.config.extension_大乱斗_nsc;
 		if (_status.daluandou_skills.length < game.players.length * tnsc) alert('技能池太小，建议增加武将或减少候选技能数');
-		else if (_status.daluandou_tret.length < game.players.reduce((acc, target) => {
-			return acc + target.storage.dld.tret;
-		}, 0)) alert('添头技能池太小，建议增加武将或减少候选技能数');
-		else if (tnsc < 6) alert('候选技能数太少，建议增加候选技能数');
 		else if (tnsc / nsc > 0.7) alert('可选技能数过多，建议减少可选技能数');
 		else if (tnsc < 8) alert('候选技能数太少，建议增加候选技能数');
 		else alert('禁配技能对过多，建议删除不必要的禁配或增加候选技能数');
@@ -290,6 +290,7 @@ export function precontent(config, pack) {
 	});
 	lib.arenaReady.push(function () {
 		if (!Array.isArray(lib.config.extension_大乱斗_check)) game.saveExtensionConfig('大乱斗', 'check', []);
+		if (!Array.isArray(lib.config.extension_大乱斗_waitForCheck)) game.saveExtensionConfig('大乱斗', 'waitForCheck', []);
 		if (Object.prototype.toString.call(lib.config.extension_大乱斗_ief) !== '[object AsyncFunction]') game.saveExtensionConfig(
 			'大乱斗',
 			'ief',
@@ -722,7 +723,7 @@ export function precontent(config, pack) {
 					let skill = _status.daluandou_common.randomGet();
 					if (!lib.translate[skill] || trans.includes(lib.translate[skill])) {
 						if (--trymax < 0) {
-							game.dldLessAlert();
+							game.dldLessAlert('常驻技能池太小，建议增加常驻技能或减少候选技能数');
 							break;
 						}
 						count++;
@@ -868,6 +869,7 @@ export function precontent(config, pack) {
 				const target = res[0], result = res[1] || lib.skill.dld_init.selectSkills(target, skillsMap[target.playerid]);
 				if (!target || !result) continue;
 				let skills = result.links;
+				if (result.check) lib.config.extension_大乱斗_waitForCheck.addArray(result.check);
 				if (lib.config.extension_大乱斗_enableTret !== 'off') {
 					target.storage.dld.tret += 2 * (result.max - skills.length);
 				}
@@ -903,6 +905,7 @@ export function precontent(config, pack) {
 				}
 				players.remove(target);
 			}
+			game.saveExtensionConfig('大乱斗', 'waitForCheck', lib.config.extension_大乱斗_waitForCheck);
 			await lib.skill.dld_allot.setAllotSkills(obj);
 			await game.delay();
 			game.broadcastAll((time) => {
@@ -925,7 +928,7 @@ export function precontent(config, pack) {
 			if (!_status.dld_config.started) {
 				if (_status.dld_config.enableTret !== 'off') extintro = '<br><font color=#00FFB0>你可以少选任意个技能，稍后额外选择二倍数量的添头技</font>';
 			}
-			let me = !_status.connectMode || event.target !== game.me, list = event.skills[0].map((skill, i) => {
+			let me = !_status.connectMode || event.target === game.me, list = event.skills[0].map((skill, i) => {
 				if (!lib.skill[skill]) alert('未找到技能' + skill + '，' + (me ? '您' : '房主') + '可能往常驻技能池添加了一个该模式不存在的技能。请立即停止游戏' + (me ? '' : '并检查是否与房主游戏版本保持一致、扩展保持一致等') + '排查问题！');
 				return [skill, '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><b><font color=#FFFF00>' + (lib.translate[skill] || '无名技能') + '</font></b>：' + get.skillInfoTranslation(skill, event.target) + '</div>'];
 			}).concat(event.skills[1].map((skill, i) => {
@@ -972,6 +975,29 @@ export function precontent(config, pack) {
 				links: result.links,
 				max: event.nsc
 			};
+			if (lib.config.extension_大乱斗_check) {
+				result = await event.target.chooseButton([
+						'请选择你觉得<font color=#FF0000>不应该</font>在一般技能池的技能，这些技能将' + (get.event('me') ? '于下次审批技能时加入' : '交给房主处理'),
+						[event.skills[1].map((skill, i) => {
+							let str = '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><b><font color=#00FF00>' + lib.translate[skill] + '</font></b>：' + lib.translate[skill + '_info'];
+							if (lib.skill[skill].derivation) {
+								let derivation;
+								if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation.slice(0);
+								else derivation = [lib.skill[skill].derivation];
+								for (let j of derivation) {
+									str += '<br><span class="thundertext">：' + lib.translate[j + '_info'] + '</span>';
+								}
+							}
+							return [skill, str + '</div>'];
+						}), 'textbutton']
+					])
+					.set('me', me)
+					.set('ai', () => -1)
+					.set('selectButton', [1,  event.skills[1].length])
+					.set('complexSelect', false)
+					.forResult();
+				if (result.bool) event.result.check = result.links;
+			}
 		},
 	};
 	lib.skill.dld_tret = {
@@ -1009,7 +1035,7 @@ export function precontent(config, pack) {
 				let skill = _status.daluandou_tret.randomGet();
 				if (!lib.translate[skill] || info.includes(lib.translate[skill])) {
 					if (--trymax < 0) {
-						game.dldLessAlert();
+						game.dldLessAlert('添头技能池太小，建议减少候选技能数或关闭添头技');
 						break;
 					}
 					count++;
@@ -1141,7 +1167,7 @@ export function precontent(config, pack) {
 		},
 		async contentx(event) {
 			_status.noclearcountdown = true;
-			let max = Math.min(event.num, event.skills.length), me = (!_status.connectMode || event.target !== game.me);
+			let max = Math.min(event.num, event.skills.length), me = (!_status.connectMode || event.target === game.me);
 			let list = event.skills.map((skill, i) => {
 				if (!lib.skill[skill]) alert('未找到技能' + skill + '，' + (me ? '您' : '房主') + '可能往添头技能池添加了一个该模式不存在的技能。请立即停止游戏' + (me ? '' : '并检查是否与房主游戏版本保持一致、扩展保持一致等') + '排查问题！');
 				let str = '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><b><font color=#00FF00>' + (lib.translate[skill] || '无名技能') + '</font></b>：' + get.skillInfoTranslation(skill, event.target);
@@ -1215,7 +1241,7 @@ export function precontent(config, pack) {
 			let list = _status.dld_config.zhus[player.group].randomGets(trigger.name === 'phase' ? 3 : 1), result;
 			if (list.length === 1) result = { control: list[0] };
 			else if (list.length) result = await player.chooseControl(list).set('choiceList', list.map(i => {
-				if (!lib.skill[i]) alert('未找到技能' + i + '，请立即停止游戏' + (_status.connectMode ? '并检查是否与房主游戏版本保持一致、扩展保持一致等' : '') + '排查问题！');
+				if (!lib.skill[i]) alert('未找到技能' + i + '，请立即停止游戏' + ((_status.connectMode || player === game.me) ? '并检查是否与房主游戏版本保持一致、扩展保持一致等' : '') + '排查问题！');
 				let info = '<div class="skill">' + (lib.translate[i] || '无名技能') + '</div><div>' + get.skillInfoTranslation(i, player);
 				if (lib.translate[i + '_append']) str += '<br><span class="yellowtext">' + lib.translate[i + '_append'] + '</span>';
 				if (lib.skill[i].derivation) {
@@ -1403,7 +1429,9 @@ export function precontent(config, pack) {
 				return;
 			}
 			do {
-				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
+				let skills;
+				if (lib.config.extension_大乱斗_waitForCheck.length) skills = lib.config.extension_大乱斗_waitForCheck;
+				else skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
 				lib.config.extension_大乱斗_check.addArray(skills);
 				for (let name of ['common', 'disabled', 'tret']) {
 					let result = await player.chooseButton([
@@ -1428,6 +1456,7 @@ export function precontent(config, pack) {
 						if (!skills.length) break;
 					}
 				}
+				if (lib.config.extension_大乱斗_waitForCheck.length) game.saveExtensionConfig('大乱斗', 'waitForCheck', []);
 				if (!allSkills.length) {
 					alert('当前将池技能已批阅完毕！');
 					break;
