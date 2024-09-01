@@ -24,9 +24,9 @@ export function precontent(config, pack) {
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
 			`<center>
-				<font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>8</font>月<font color=fire>30</font>日
+				<font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>9</font>月<font color=fire>1</font>日
 			</center>`,
-			'◆玩家选技能后可将不合理技能交由房主下次单机时审批（［技能审批］设0则无此项）',
+			'◆调整候选技能显示文本',
 			'◆删除冗余检测',
 			'◆修复提示内容',
 			'◆代码规范',
@@ -60,6 +60,13 @@ export function precontent(config, pack) {
 		});
 		lib.init.onfree();
 	};
+	/**
+	 * 判断skill是否被弃用
+	 * @param { string } skill 所检查技能ID
+	 * @param { string | string[] } [names] 角色拥有的武将名单
+	 * @param { boolean } [unique] 是否检测其专属性
+	 * @returns { boolean }
+	 */
 	lib.filter.skillDisabled = function (skill, names, unique) {
 		if (!lib.translate[skill]) return true;
 		let translate = lib.translate[skill + '_info'];
@@ -155,8 +162,13 @@ export function precontent(config, pack) {
 			return skill;
 		}
 	};
+	/**
+	 * 大乱斗技能不足弹窗
+	 * @param { string } [str] 弹窗内容
+	 */
 	game.dldLessAlert = (str) => {
 		if (_status.dld_less) return;
+		_status.dld_less = true;
 		if (str) {
 			alert(str);
 			return;
@@ -166,8 +178,13 @@ export function precontent(config, pack) {
 		else if (tnsc / nsc > 0.7) alert('可选技能数过多，建议减少可选技能数');
 		else if (tnsc < 8) alert('候选技能数太少，建议增加候选技能数');
 		else alert('禁配技能对过多，建议删除不必要的禁配或增加候选技能数');
-		_status.dld_less = true;
 	};
+	/**
+	 * 编辑大乱斗技能池
+	 * @param { HTMLDivElement } temp 当前HTML
+	 * @param { string } config 配置名
+	 * @param { string } name 技能池名称
+	 */
 	game.editDldList = (temp, config, name) => {
 		let two = config === 'group';
 		game.prompt(`请输入要加入/移出${name}的${two ? '两个' : ''}技能ID${two ? '（用空格分开）' : ''}`, str => {
@@ -183,17 +200,13 @@ export function precontent(config, pack) {
 			if (!skills.length) return;
 			for (let i of skills) {
 				if (!lib.skill[i]) return show(`
-					<div style="color:rgb(255,0,0);font-family:xinwei">
-						<font size="4">
-							未找到${i}对应技能
-						</font>
+					<div style="color: rgb(255,0,0); font-family: xinwei; font-size: 113%">
+						未找到${i}对应技能
 					</div>
 				`);
 				if (lib.filter.skillDisabled(i, null, true)) return show(`
-					<div style="color:rgb(255,0,0);font-family:xinwei">
-						<font size="4">
-							${i}已被禁用
-						</font>
+					<div style="color: rgb(255,0,0); font-family: xinwei; font-size: 113%">
+						${i}已被禁用
 					</div>
 				`);
 			}
@@ -208,59 +221,52 @@ export function precontent(config, pack) {
 				}
 				if (!find && skills.length === 2) {
 					if (skills[0] === skills[1]) return show(`
-						<div style="color:rgb(255,255,0);font-family:xinwei">
-							<font size="4">
-								请输入两个不同的技能ID！
-							</font>
+						<div style="color: rgb(255,255,0); font-family: xinwei; font-size: 113%">
+							请输入两个不同的技能ID！
 						</div>
 					`);
 					lists.push(skills);
 					show(`
-						<div style="color:rgb(210,210,000);font-family:xinwei">
-							<font size="4">
-								已将【${lib.translate[skills[0]]}】＋【${lib.translate[skills[1]]}】加入${name}
-							</font>
+						<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
+							已将【${lib.translate[skills[0]]}】＋【${lib.translate[skills[1]]}】加入${name}
 						</div>
 					`);
 				}
 				else if (skills.length === 1 || skills[0] === skills[1]) show(`
-					<div style="color:rgb(210,210,000);font-family:xinwei">
-						<font size="4">
-							已将【${lib.translate[skills[0]]}】相关的技能对移出${name}
-						</font>
+					<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
+						已将【${lib.translate[skills[0]]}】相关的技能对移出${name}
 					</div>
 				`);
 				else show(`
-					<div style="color:rgb(210,210,000);font-family:xinwei">
-						<font size="4">
-							已将【${lib.translate[skills[0]]}】＋【${lib.translate[skills[1]]}】移出${name}
-						</font>
+					<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
+						已将【${lib.translate[skills[0]]}】＋【${lib.translate[skills[1]]}】移出${name}
 					</div>
 				`);
 			}
 			else if (lists.includes(skills[0])) {
 				lists.remove(skills[0]);
 				show(`
-					<div style="color:rgb(210,210,000);font-family:xinwei">
-						<font size="4">
-							已将【${lib.translate[skills[0]]}】移出${name}
-						</font>
+					<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
+						已将【${lib.translate[skills[0]]}】移出${name}
 					</div>
 				`);
 			}
 			else {
 				lists.push(skills[0]);
 				show(`
-					<div style="color:rgb(255,97,3);font-family:xinwei">
-						<font size="4">
-							已将【${lib.translate[skills[0]]}】加入${name}
-						</font>
+					<div style="color: rgb(255,97,3); font-family: xinwei; font-size: 113%">
+						已将【${lib.translate[skills[0]]}】加入${name}
 					</div>
 				`);
 			}
 			game.saveExtensionConfig('大乱斗', config, lists);
 		});
 	};
+	/**
+	 * 查看大乱斗技能池
+	 * @param { string } config 配置名
+	 * @param { string } name 技能池名称
+	 */
 	game.viewDldList = (config, name) => {
 		/** 改自《手杀UI》和《群英荟萃》 */
 		let h = document.body.offsetHeight,
@@ -325,17 +331,59 @@ export function precontent(config, pack) {
 			</body>
 		</html>`;
 		var List = ui.create.div('', `
-			<div style='z-index:114514'>
-				<iframe width='${w}px' height='${h}px' srcdoc="<!DOCTYPE html>${info}"></iframe>
+			<div style="z-index:114514">
+				<iframe width="${w}px" height="${h}px" srcdoc="<!DOCTYPE html>${info}"></iframe>
 			</div>
 		`, ui.window);
 		ui.create.div('', `
-			<div style="height:10px; width:${w}px; text-align:center; z-index:114514">
-				<font size='5em'>关闭</font>
+			<div style="height: 10px; width: ${w}px; text-align: center; z-index: 114514">
+				<font size="5em">关闭</font>
 			</div>
 		`, List, function () {
 			List.delete();
 		});
+	};
+	/**
+	 * 获取技能在type技能池下的按钮内容
+	 * @param { string } skill 技能ID
+	 * @param { string } [type] 技能池类型
+	 * @returns { string }
+	 */
+	get.dldSkillButton = (skill, type) => {
+		let info, color = {
+			normal: 'color: #00FF00; ',
+			common: 'color: #FFFF00; ',
+			disabled: 'color: #FF0000; ',
+			tret: 'color: #8DFDD8; ',
+			zhu: 'color: #E983FF; ',
+		}[type] || '';
+		if (type === 'zhu') info = `
+			<div class="skill">${lib.translate[skill]}</div>
+			<div>${lib.translate[skill + '_info']}
+		`
+		else info = `
+			<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
+				<span style="${color}font-weight: bold">
+					${lib.translate[skill]}
+				</span>
+				：${lib.translate[skill + '_info']}
+		`;
+		if (lib.translate[skill + '_append']) {
+			info += `<br><span class="firetext">${lib.translate[skill + '_append']}</span>`;
+		}
+		if (lib.skill[skill].derivation) {
+			let derivation;
+			if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation;
+			else derivation = [lib.skill[skill].derivation];
+			for (let der of derivation) {
+				info += `
+					<br><span class="thundertext">
+						${lib.translate[der]}：${lib.translate[der + '_info']}
+					</span>
+				`;
+			}
+		}
+		return info + '</div>';
 	};
 	lib.init.js(lib.assetURL + 'extension/大乱斗/js/character.js', null, () => {
 		lib.config.all.characters.push('dld');
@@ -344,7 +392,6 @@ export function precontent(config, pack) {
 	});
 	lib.arenaReady.push(function () {
 		if (!Array.isArray(lib.config.extension_大乱斗_check)) game.saveExtensionConfig('大乱斗', 'check', []);
-		if (!Array.isArray(lib.config.extension_大乱斗_waitForCheck)) game.saveExtensionConfig('大乱斗', 'waitForCheck', []);
 		if (Object.prototype.toString.call(lib.config.extension_大乱斗_ief) !== '[object AsyncFunction]') game.saveExtensionConfig(
 			'大乱斗',
 			'ief',
@@ -696,27 +743,15 @@ export function precontent(config, pack) {
 			let next = event.target.chooseButton([
 				'选择要加到主将牌上的技能（其余技能将加到副将牌上）',
 				[event.skills.map((skill, i) => {
-					let str = (
-						'<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><b><font color=#00FF00>' +
-						(lib.translate[skill] || '无名技能') +
-						'</font></b>：' +
-						get.skillInfoTranslation(skill, event.target)
-					);
-					if (lib.skill[skill].derivation) {
-						let derivation;
-						if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation.slice(0);
-						else derivation = [lib.skill[skill].derivation];
-						for (let j of derivation) {
-							str += (
-								'<br><span class="thundertext"><b>' +
-								(lib.translate[j] || '无名技能') +
-								'</b>：' +
-								get.skillInfoTranslation(j, event.target) +
-								'</span>'
-							);
-						}
-					}
-					return [skill, str + '</div>'];
+					return [
+						skill,
+						`<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
+							<span class="greentext">
+								${lib.translate[skill]}
+							</span>
+							：${get.skillInfoTranslation(skill, event.target)}
+						</div>`
+					];
 				}), 'textbutton']
 			]);
 			next.set('forced', true);
@@ -944,7 +979,6 @@ export function precontent(config, pack) {
 				const target = res[0], result = res[1] || lib.skill.dld_init.selectSkills(target, skillsMap[target.playerid]);
 				if (!target || !result) continue;
 				let skills = result.links;
-				if (result.check) lib.config.extension_大乱斗_waitForCheck.addArray(result.check);
 				if (lib.config.extension_大乱斗_enableTret !== 'off') {
 					target.storage.dld.tret += 2 * (result.max - skills.length);
 				}
@@ -980,7 +1014,6 @@ export function precontent(config, pack) {
 				}
 				players.remove(target);
 			}
-			game.saveExtensionConfig('大乱斗', 'waitForCheck', lib.config.extension_大乱斗_waitForCheck);
 			await lib.skill.dld_allot.setAllotSkills(obj);
 			await game.delay();
 			game.broadcastAll((time) => {
@@ -1003,28 +1036,18 @@ export function precontent(config, pack) {
 			if (!_status.dld_config.started && _status.dld_config.enableTret !== 'off') {
 				extintro = '<br><font color=#00FFB0>你可以少选任意个技能，稍后额外选择二倍数量的添头技</font>';
 			}
-			let list = event.skills[0].map((s, i) => {
+			let list = event.skills[0].map((skill, i) => {
 				return [
-					s,
-					`<div class="popup text" style="width:calc(100% - 10px);display:inline-block">
-						<b><font color=#FFFF00>${lib.translate[s]}</font></b>：${lib.translate[s + '_info']}
+					skill,
+					`<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
+						<span style="color: #FFFF00; font-weight: bold">
+							${lib.translate[skill]}
+						</span>
+						：${lib.translate[skill + '_info']}
 					</div>`
 				];
-			}).concat(event.skills[1].map((s, i) => {
-				let str = `
-					<div class="popup text" style="width:calc(100% - 10px);display:inline-block">
-						<b><font color=#00FF00>${lib.translate[s]}</font></b>：${lib.translate[s + '_info']}
-				`;
-				if (lib.translate[s + '_append']) str += `<br><span class="yellowtext">${lib.translate[s + '_append']}</span>`;
-				if (lib.skill[s].derivation) {
-					let derivation;
-					if (Array.isArray(lib.skill[s].derivation)) derivation = lib.skill[s].derivation.slice(0);
-					else derivation = [lib.skill[s].derivation];
-					for (let j of derivation) {
-						str += `<br><span class="thundertext"><b>${lib.translate[j]}</b>：${lib.translate[j + '_info']}</span>`;
-					}
-				}
-				return [s, str + '</div>'];
+			}).concat(event.skills[1].map((skill, i) => {
+				return [skill, get.dldSkillButton(skill, 'normal')];
 			}));
 			if (!list.length) {
 				event.result = { links: [] };
@@ -1056,35 +1079,6 @@ export function precontent(config, pack) {
 				links: result.links,
 				max: event.nsc
 			};
-			if (lib.config.extension_大乱斗_filterSkills) {
-				result = await event.target
-					.chooseButton([
-						(
-							'请选择你觉得<font color=#FF0000>不应该</font>在一般技能池的技能，这些技能将' +
-							((!_status.connectMode || event.target === game.me) ? '于下次审批技能时加入' : '交给房主处理')
-						),
-						[event.skills[1].map((s, i) => {
-							let str = `
-								<div class="popup text" style="width:calc(100% - 10px);display:inline-block">
-									<b><font color=#00FF00>${lib.translate[s]}</font></b>：${lib.translate[s + '_info']}
-							`;
-							if (lib.skill[s].derivation) {
-								let derivation;
-								if (Array.isArray(lib.skill[s].derivation)) derivation = lib.skill[s].derivation.slice(0);
-								else derivation = [lib.skill[s].derivation];
-								for (let j of derivation) {
-									str += `<br><span class="thundertext">：${lib.translate[j + '_info']}</span>`;
-								}
-							}
-							return [s, str + '</div>'];
-						}), 'textbutton']
-					])
-					.set('ai', () => -1)
-					.set('selectButton', [1, event.skills[1].length])
-					.set('complexSelect', false)
-					.forResult();
-				if (result.bool) event.result.check = result.links;
-			}
 		},
 	};
 	lib.skill.dld_tret = {
@@ -1255,21 +1249,8 @@ export function precontent(config, pack) {
 		async contentx(event) {
 			_status.noclearcountdown = true;
 			let max = Math.min(event.num, event.skills.length);
-			let list = event.skills.map((s, i) => {
-				let str = `
-					<div class="popup text" style="width:calc(100% - 10px);display:inline-block">
-						<b><font color=#00FF00>${lib.translate[s]}</font></b>：${lib.translate[s + '_info']}
-				`;
-				if (lib.translate[s + '_append']) str += `<br><span class="yellowtext">${lib.translate[s + '_append']}</span>`;
-				if (lib.skill[s].derivation) {
-					let derivation;
-					if (Array.isArray(lib.skill[s].derivation)) derivation = lib.skill[s].derivation.slice(0);
-					else derivation = [lib.skill[s].derivation];
-					for (let j of derivation) {
-						str += `<br><span class="thundertext"><b>${lib.translate[j]}</b>：${lib.translate[j + '_info']}</span>`;
-					}
-				}
-				return [s, str + '</div>'];
+			let list = event.skills.map((skill, i) => {
+				return [skill, get.dldSkillButton(skill, 'tret')];
 			});
 			if (!list.length) {
 				event.result = { links: [] };
@@ -1332,17 +1313,7 @@ export function precontent(config, pack) {
 			else if (list.length > 0) result = await player
 				.chooseControl(list)
 				.set('choiceList', list.map(i => {
-					let info = `<div class="skill">${lib.translate[i]}</div><div>${lib.translate[i + '_info']}`;
-					if (lib.translate[i + '_append']) str += `<br><span class="yellowtext">${lib.translate[i + '_append']}</span>`;
-					if (lib.skill[i].derivation) {
-						let derivation;
-						if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation.slice(0);
-						else derivation = [lib.skill[skill].derivation];
-						for (let j of derivation) {
-							info += `<br><span class="thundertext"><b>${lib.translate[j]}</b>：${lib.translate[j + '_info']}</span>`;
-						}
-					}
-					return info + '</div>';
+					return get.dldSkillButton(i, 'zhu');
 				}))
 				.set('prompt', '选择要获得的一项主公技')
 				.set('displayIndex', false)
@@ -1443,13 +1414,10 @@ export function precontent(config, pack) {
 			}), result;
 			if (skills.length) result = await player
 				.chooseControl(skills)
-				.set('choiceList', skills.map(i => {
-					let info = `
-						<div class="skill" style="color:#FFFF00">${lib.translate[i]}</div>
-						<div>${get.skillInfoTranslation(i, target)}
-					`;
-					return info + '</div>';
-				}))
+				.set('choiceList', skills.map(i => `
+					<div class="skill" style="color:#FFFF00">${lib.translate[i]}</div>
+					<div>${get.skillInfoTranslation(i, target)}</div>
+				`))
 				.set('prompt', '选择要移除的一项技能')
 				.set('displayIndex', false)
 				.set('ai', () => get.event('idx'))
@@ -1528,43 +1496,26 @@ export function precontent(config, pack) {
 		ruleSkill: true,
 		async content(event, trigger, player) {
 			let allSkills = _status.daluandou_skills.filter(i => {
-				return !lib.config.extension_大乱斗_check.includes(i);
-			}), trans = {
-				common: '<font color=#FFFF00>常驻技能池</font>',
-				disabled: '<font color=#FF0000>禁选技能池</font>',
-				tret: '<font color=#00FF00>添头技能池</font>'
-			};
+					return !lib.config.extension_大乱斗_check.includes(i);
+				}),
+				trans = {
+					common: '<font color=#FFFF00>常驻技能池</font>',
+					disabled: '<font color=#FF0000>禁选技能池</font>',
+					tret: '<font color=#8DFDD8>添头技能池</font>'
+				};
 			if (!allSkills.length) {
 				alert('当前将池技能已批阅完毕！');
 				return;
 			}
 			do {
-				let skills;
-				if (lib.config.extension_大乱斗_waitForCheck.length) skills = lib.config.extension_大乱斗_waitForCheck;
-				else skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
+				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
 				lib.config.extension_大乱斗_check.addArray(skills);
 				for (let name of ['common', 'disabled', 'tret']) {
 					let result = await player
 						.chooseButton([
 							'选择要添加到' + trans[name] + '的技能，剩余技能将' + (name === 'tret' ? '作为普通技能' : '进行其他技能池的筛选'),
 							[skills.map((s, i) => {
-								let str = `
-									<div class="popup text" style="width:calc(100% - 10px);display:inline-block">
-										<b><font color=#00FF00>${lib.translate[s]}[${s}]</font></b>：${lib.translate[s + '_info']}
-								`;
-								if (lib.skill[s].derivation) {
-									let derivation;
-									if (Array.isArray(lib.skill[s].derivation)) derivation = lib.skill[s].derivation.slice(0);
-									else derivation = [lib.skill[s].derivation];
-									for (let j of derivation) {
-										str += `
-											<br><span class="thundertext">
-												<b>${lib.translate[j]}[${j}]</b>：${lib.translate[j + '_info']}
-											</span>
-										`;
-									}
-								}
-								return [s, str + '</div>'];
+								return [s, get.dldSkillButton(s, name)];
 							}), 'textbutton']
 						])
 						.set('ai', () => 0)
@@ -1578,7 +1529,6 @@ export function precontent(config, pack) {
 						if (!skills.length) break;
 					}
 				}
-				if (lib.config.extension_大乱斗_waitForCheck.length) game.saveExtensionConfig('大乱斗', 'waitForCheck', []);
 				if (!allSkills.length) {
 					alert('当前将池技能已批阅完毕！');
 					break;
