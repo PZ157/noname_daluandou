@@ -24,7 +24,8 @@ export function precontent(config, pack) {
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version) lib.game.showChangeLog = function () {
 		let str = [
 			`<center>
-				<font color=#00FFFF>更新日期</font>：24年<font color=#00FFB0>9</font>月<font color=fire>1</font>日
+				<span style="color: #00FFFF">更新日期</span>：
+				24年<span style="color: #00FFB0">9</span>月<span style="color: #FF0000">2</span>日
 			</center>`,
 			'◆调整候选技能显示文本',
 			'◆删除冗余检测',
@@ -87,11 +88,11 @@ export function precontent(config, pack) {
 		if (info.unique && !unique) {
 			if (!names) {
 				let player = _status.event.player;
-				if (get.itemtype(player) !== "player") return true;
-				names = [player.name, player.name1, player.name2];
+				if (get.itemtype(player) !== 'player') return true;
+				names = get.nameList(player);
 			}
 			if (!Array.isArray(names)) names = [names];
-			if (typeof info.unique === "function") return !info.unique(names);
+			if (typeof info.unique === 'function') return !info.unique(names);
 			for (let name of names) {
 				if (get.character(name, 3).includes(skill)) return false;
 			}
@@ -306,14 +307,10 @@ export function precontent(config, pack) {
 				div {
 					width: 160vmin;
 					height: 80vmin;
-					border: 0px solid black;
+					border: 0 solid black;
 					border-radius: 9px;
 					padding: 15px;
-					margin-top: 6.3vmin;
-					margin-bottom: 5.5vmin;
-					margin-left: 15.5vmin;
-					margin-right: 5.5vmin;
-					position: center;
+					margin: 6.3vmin 5.5vmin 5.5vmin 15.5vmin;
 				}
 				div.ex1 {
 					width: 160vmin;
@@ -330,7 +327,7 @@ export function precontent(config, pack) {
 				</div>
 			</body>
 		</html>`;
-		var List = ui.create.div('', `
+		const List = ui.create.div('', `
 			<div style="z-index:114514">
 				<iframe width="${w}px" height="${h}px" srcdoc="<!DOCTYPE html>${info}"></iframe>
 			</div>
@@ -351,11 +348,11 @@ export function precontent(config, pack) {
 	 */
 	get.dldSkillButton = (skill, type) => {
 		let info, color = {
-			normal: 'color: #00FF00; ',
-			common: 'color: #FFFF00; ',
-			disabled: 'color: #FF0000; ',
-			tret: 'color: #8DFDD8; ',
-			zhu: 'color: #E983FF; ',
+			normal: 'color: #00FF00',
+			common: 'color: #FFFF00',
+			disabled: 'color: #FF0000',
+			tret: 'color: #8DFDD8',
+			zhu: 'color: #E983FF',
 		}[type] || '';
 		if (type === 'zhu') info = `
 			<div class="skill">${lib.translate[skill]}</div>
@@ -363,7 +360,7 @@ export function precontent(config, pack) {
 		`
 		else info = `
 			<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
-				<span style="${color}font-weight: bold">
+				<span style="font-weight: bold; ${color}">
 					${lib.translate[skill]}
 				</span>
 				：${lib.translate[skill + '_info']}
@@ -398,7 +395,8 @@ export function precontent(config, pack) {
 			(
 				"func = async function (player, configs) {" +
 				"\r\tlet mode = get.mode(), isZhu = function (current) {" +
-				"\r\t\tif (!current.identityShown || mode !== 'identity' && mode !== 'versus' && mode !== 'doudizhu') return false;" +
+				"\r\t\tif (!current.identityShown) return false;" +
+				"\r\t\tif (mode !== 'identity' && mode !== 'versus' && mode !== 'doudizhu') return false;" +
 				"\r\t\treturn (" +
 				"\r\t\t\tcurrent === game.zhu ||" +
 				"\r\t\t\tcurrent === game.rZhu ||" +
@@ -438,14 +436,8 @@ export function precontent(config, pack) {
 		if (get.mode() === 'guozhan') return;
 		_status.daluandou_characters = {};
 		_status.daluandou_zhus = {};
-		/*let fixH = lib.config.extension_大乱斗_fixH.split('/').map(i => {
-			return Number(i);
-		});*/
 		for (let i in lib.character) {
 			if (i.startsWith('dld_')) continue;
-			/*lib.character[i].hp = fixH[0];
-			lib.character[i].maxHp = fixH[1];
-			lib.character[i].hujia = fixH[2];*/
 			_status.daluandou_characters[i] = lib.character[i].skills.slice(0);
 			lib.character[i].hasHiddenSkill = false;
 			lib.character[i].initFilters = [];
@@ -475,9 +467,6 @@ export function precontent(config, pack) {
 			}), {
 				started: false,
 				allotSkills: {},
-				//tnsc: lib.config.extension_大乱斗_tnsc,
-				//nsc: lib.config.extension_大乱斗_nsc,
-				//ief: lib.config.extension_大乱斗_ief,
 				group: lib.config.extension_大乱斗_group,
 				tret: lib.config.extension_大乱斗_tret,
 				zhuSkill: lib.config.extension_大乱斗_zhuSkill,
@@ -568,7 +557,8 @@ export function precontent(config, pack) {
 		charlotte: true,
 		ruleSkill: true,
 		isZhu(current) {
-			if (!current.identityShown || get.mode() !== 'identity' && get.mode() !== 'versus' && get.mode() !== 'doudizhu') return false;
+			if (!current.identityShown) return false;
+			if (get.mode() !== 'identity' && get.mode() !== 'versus' && get.mode() !== 'doudizhu') return false;
 			return (
 				current === game.zhu ||
 				current === game.rZhu ||
@@ -586,7 +576,7 @@ export function precontent(config, pack) {
 				player.ai.shown = 1;
 				player.setIdentity('野', 'nei');
 			}, target);
-			game.log(target, '的身份是<font color=#8D9CFF>野心家</font>');
+			game.log(target, '的身份是<span style="color: #8D9CFF">野心家</span>');
 		},
 		async content(event, trigger, player) {
 			let func;
@@ -682,11 +672,11 @@ export function precontent(config, pack) {
 			}
 			if (ai_targets.length) for (let target of ai_targets) {
 				let skills = skillsMap[target.playerid], main = [], vice = skills.filter(j => {
-					return lib.skill[j] && lib.skill[j].viceSkill;
+					return lib.skill[j]?.viceSkill;
 				}), res = {};
 				for (let i of skills) {
 					if (vice.includes(i)) continue;
-					if (!main.length || lib.skill[i] && lib.skill[i].mainSkill) main.push(i);
+					if (!main.length || lib.skill[i]?.mainSkill) main.push(i);
 					else if (!vice.length) vice.push(i);
 					else if (Math.random() < 0.5) main.push(i);
 					else vice.push(i);
@@ -1034,7 +1024,7 @@ export function precontent(config, pack) {
 			_status.noclearcountdown = true;
 			let max = Math.min(event.skills[0].length + event.skills[1].length, event.nsc), extintro = '';
 			if (!_status.dld_config.started && _status.dld_config.enableTret !== 'off') {
-				extintro = '<br><font color=#00FFB0>你可以少选任意个技能，稍后额外选择二倍数量的添头技</font>';
+				extintro = '<br><span style="color: #00FFB0">你可以少选任意个技能，稍后额外选择二倍数量的添头技</span>';
 			}
 			let list = event.skills[0].map((skill, i) => {
 				return [
@@ -1390,7 +1380,7 @@ export function precontent(config, pack) {
 			}
 		}
 	};
-	lib.translate.dld_neiBuff1 = '<font color=#8D9CFF>不臣之心</font>';
+	lib.translate.dld_neiBuff1 = '<span style="color: #8D9CFF">不臣之心</span>';
 	lib.skill.dld_neiBuff2 = {
 		mode: ['identity'],
 		enable: 'phaseUse',
@@ -1422,7 +1412,7 @@ export function precontent(config, pack) {
 				.set('displayIndex', false)
 				.set('ai', () => get.event('idx'))
 				.set('idx', function () {
-					if (skills.length == 1) return 0;
+					if (skills.length === 1) return 0;
 					let good = [], normal = [], half = [], less = [];
 					for (let i = 0; i < skills.length; i++) {
 						let info = lib.skill[skills[i]];
@@ -1458,18 +1448,22 @@ export function precontent(config, pack) {
 			result: {
 				player(player, target) {
 					if (game.players.length === 2) return 1;
-					let num = game.zhu.hp + game.zhu.hujia + player.countCards('hs', 'tao'), dif = game.countPlayer(current => {
-						if (current.identity == 'zhong' || current.identity == 'mingzhong') {
-							return current.hp + current.hujia + current.countCards('hs') / 12;
-						}
-					}) - game.countPlayer(current => {
-						if (current.identity == 'zhong') return current.hp + current.hujia + current.countCards('hs') / 12;
-					});
+					let num = game.zhu.hp + game.zhu.hujia + player.countCards('hs', 'tao'),
+						dif = game.countPlayer(current => {
+							if (current.identity === 'zhong' || current.identity === 'mingzhong') {
+								return current.hp + current.hujia + current.countCards('hs') / 12;
+							}
+						}) - game.countPlayer(current => {
+							if (current.identity === 'zhong') return current.hp + current.hujia + current.countCards('hs') / 12;
+						});
 					if (num * num + num + dif < 0) return 1;
 					if (dif > player.hp + player.hujia + player.countCards('hes') / 4) return 1;
 					if (
-						!game.hasPlayer(current => current.identity == 'fan') &&
-						(get.attitude(game.zhu, player) < -0.5 || get.attitude(game.zhu, player) < 0 && player.ai.shown >= 0.95)
+						!game.hasPlayer(current => current.identity === 'fan') &&
+						(
+							get.attitude(game.zhu, player) < -0.5 ||
+							get.attitude(game.zhu, player) < 0 && player.ai.shown >= 0.95
+						)
 					) return 1;
 					return -1024;
 				},
@@ -1496,13 +1490,12 @@ export function precontent(config, pack) {
 		ruleSkill: true,
 		async content(event, trigger, player) {
 			let allSkills = _status.daluandou_skills.filter(i => {
-					return !lib.config.extension_大乱斗_check.includes(i);
-				}),
-				trans = {
-					common: '<font color=#FFFF00>常驻技能池</font>',
-					disabled: '<font color=#FF0000>禁选技能池</font>',
-					tret: '<font color=#8DFDD8>添头技能池</font>'
-				};
+				return !lib.config.extension_大乱斗_check.includes(i);
+			}), trans = {
+				common: '<span style="color: #FFFF00">常驻技能池</span>',
+				disabled: '<span style="color: #FF0000">禁选技能池</span>',
+				tret: '<span style="color: #8DFDD8">添头技能池</span>'
+			};
 			if (!allSkills.length) {
 				alert('当前将池技能已批阅完毕！');
 				return;
