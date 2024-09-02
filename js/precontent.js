@@ -27,6 +27,7 @@ export function precontent(config, pack) {
 				<span style="color: #00FFFF">更新日期</span>：
 				24年<span style="color: #00FFB0">9</span>月<span style="color: #FF0000">2</span>日
 			</center>`,
+			'◆新增版本彩蛋',
 			'◆调整候选技能显示文本',
 			'◆删除冗余检测',
 			'◆修复提示内容',
@@ -1529,5 +1530,139 @@ export function precontent(config, pack) {
 			} while (confirm('是否继续批阅？（剩余' + allSkills.length + '项技能未批阅）'));
 			game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
 		}
+	};
+	lib.skill._dld_404 = {
+		trigger: {
+			player: 'useCardBefore'
+		},
+		filter(event, player) {
+			if (!event._dld_404) event._dld_404 = String(Math.random()).slice(2, 18);
+			return event._dld_404.includes('404');
+		},
+		silent: true,
+		firstDo: true,
+		priority: 404,
+		ruleSkill: true,
+		async content(event, trigger, player) {
+			const id = trigger._dld_404, func = async lose => {
+				let info = get.character(player.name1);
+				for (let i in lose) {
+					info[i] = lose[i];
+				}
+				game.broadcastAll((info, id, name) => {
+					lib.character['dld_' + id] = info;
+					lib.translate['dld_' + id] = name;
+				}, info, id, lib.translate[player.name1]);
+				await player.reinitCharacter(player.name1, 'dld_' + id);
+			}
+			await player.chooseControl("ok").set("dialog", [
+				'###404！似乎丢了什么东西###<span style="color: #FF0000">错误代号</span>错误代号：' + id
+			]);
+			switch (Number(id[0])) {
+				case 1:
+					const cards = player.getCards("he");
+					cards.forEach(card => {
+						card.fix();
+						card.remove();
+						card.destroyed = true;
+					});
+					if (cards.length) {
+						game.log(cards, "已丢失");
+						return;
+					}
+				case 2:
+					const disables = [];
+					for (let i = 1; i <= 5; i++) {
+						for (let j = 0; j < player.countEnabledSlot(i); j++) {
+							disables.push(i);
+						}
+					}
+					if (disables.length > 0) {
+						await player.disableEquip(disables);
+						await player.disableJudge();
+						return;
+					}
+				case 3:
+					const skill = get.character(player.name1, 3).randomGet();
+					if (skill) {
+						await player.removeSkills(skill);
+						return;
+					}
+				case 4:
+					if (player.node.name.innerHTML !== '404') {
+						game.broadcastAll(player => {
+							player.node.name.innerHTML = '404';
+							if (player.name2 !== undefined) player.node.name2.innerHTML = '404';
+						}, player);
+						return;
+					}
+				case 5:
+					if (player.getAttackRange() > 0) {
+						player.addSkill('dld_attack_404');
+						return;
+					}
+				case 6:
+					if (player.getHandcardLimit() > 0) {
+						player.addSkill('dld_handcard_404');
+						return;
+					}
+				case 7:
+					if (!player.name1.startsWith('dld_')) {
+						await func({
+							hujia: 0,
+							dieAudios: [],
+							trashBin: []
+						});
+						return;
+					}
+				case 8:
+					player.maxHp = Math.floor(player.maxHp / 2);
+					if (player.maxHp > 0) {
+						await player.update();
+						return;
+					}
+				case 9:
+					player.hp = 0;
+					await player.update();
+					await player.dying();
+					return;
+				default:
+					await player.die();
+			}
+		}
+	};
+	lib.skill.dld_attack_404 = {
+		mod: {
+			attackRange(player, num) {
+				return 0;
+			}
+		},
+		mark: true,
+		marktext: ' ',
+		intro: {
+			name: '404',
+			content: '攻击范围已丢失'
+		},
+		forced: true,
+		ruleSkill: true,
+		charlotte: true,
+		priority: 404
+	};
+	lib.skill.dld_handcard_404 = {
+		mod: {
+			maxHandcardFinal(player, num) {
+				return 0;
+			}
+		},
+		mark: true,
+		marktext: ' ',
+		intro: {
+			name: '404',
+			content: '手牌上限已丢失'
+		},
+		forced: true,
+		ruleSkill: true,
+		charlotte: true,
+		priority: 404
 	};
 }
