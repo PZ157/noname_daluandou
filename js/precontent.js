@@ -34,6 +34,8 @@ export function precontent(config, pack) {
 					<span style="color: #00FFFF">更新日期</span>：
 					24年<span style="color: #00FFB0">12</span>月<span style="color: #FF0000">9</span>日
 				</center>`,
+				'◆修复初次导入bug',
+				'◆修复开局执行函数覆写无效bug',
 				'◆格式化代码',
 			];
 			let ul = document.createElement('ul');
@@ -465,7 +467,11 @@ export function precontent(config, pack) {
 	);
 	lib.arenaReady.push(function () {
 		if (!Array.isArray(lib.config.extension_大乱斗_check)) game.saveExtensionConfig('大乱斗', 'check', []);
-		if (Object.prototype.toString.call(lib.config.extension_大乱斗_ief) !== '[object AsyncFunction]')
+		if (!Array.isArray(lib.config.extension_大乱斗_common)) game.saveExtensionConfig('大乱斗', 'common', []);
+		if (!Array.isArray(lib.config.extension_大乱斗_disabled)) game.saveExtensionConfig('大乱斗', 'disabled', []);
+		if (!Array.isArray(lib.config.extension_大乱斗_group)) game.saveExtensionConfig('大乱斗', 'group', []);
+		if (!Array.isArray(lib.config.extension_大乱斗_tret)) game.saveExtensionConfig('大乱斗', 'tret', []);
+		if (typeof lib.config.extension_大乱斗_ief !== 'string') {
 			game.saveExtensionConfig(
 				'大乱斗',
 				'ief',
@@ -507,10 +513,9 @@ export function precontent(config, pack) {
 					};
 				`
 			);
-		if (!Array.isArray(lib.config.extension_大乱斗_common)) game.saveExtensionConfig('大乱斗', 'common', []);
-		if (!Array.isArray(lib.config.extension_大乱斗_disabled)) game.saveExtensionConfig('大乱斗', 'disabled', []);
-		if (!Array.isArray(lib.config.extension_大乱斗_group)) game.saveExtensionConfig('大乱斗', 'group', []);
-		if (!Array.isArray(lib.config.extension_大乱斗_tret)) game.saveExtensionConfig('大乱斗', 'tret', []);
+			alert('《大乱斗》配置载入成功！进入游戏后请手动重启游戏');
+			return;
+		}
 		if (get.mode() === 'guozhan') return;
 		_status.daluandou_characters = {};
 		_status.daluandou_zhus = {};
@@ -532,7 +537,7 @@ export function precontent(config, pack) {
 	});
 	lib.skill._dld_start = {
 		available(mode) {
-			if (mode === 'guozhan') return false;
+			if (mode === 'guozhan' || typeof lib.config.extension_大乱斗_fixH !== 'string') return false;
 			if (_status.connectMode && !game.me) return;
 			game.broadcastAll(
 				(fixH, obj) => {
@@ -802,7 +807,7 @@ export function precontent(config, pack) {
 				});
 			}
 			if (_status.connectMode) {
-				for (var i of players) i.hideTimer();
+				for (const i of players) i.hideTimer();
 			}
 			let result = {};
 			for (const res of results) {
@@ -1069,7 +1074,7 @@ export function precontent(config, pack) {
 					}, 4);
 				});
 			if (_status.connectMode) {
-				for (var i of players) i.hideTimer();
+				for (const i of players) i.hideTimer();
 			}
 			let obj = {};
 			results.sort((a, b) => lib.sort.seat(a[0], b[0]));
