@@ -1,5 +1,6 @@
 game.import('character', (lib, game, ui, get, ai, _status) => {
-	let xutou = '&nbsp&nbsp&nbsp&nbsp', dld = {
+	let xutou = '&nbsp&nbsp&nbsp&nbsp';
+	return {
 		name: 'dld',
 		connect: true,
 		character: {
@@ -9,39 +10,41 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 				hp: 3,
 				skills: ['dlds_wentian', 'dlds_zhaohun'],
 				dieAudios: ['quyuan'],
-				trashBin: ['ext:大乱斗/image/dld_quyuan.jpg']
+				trashBin: ['ext:大乱斗/image/dld_quyuan.jpg'],
 			},
 		},
 		characterSort: {
 			dld: {
-				dragon_boat: [
-					'dld_quyuan',
-				],
-			}
+				dragon_boat: ['dld_quyuan'],
+			},
 		},
 		characterIntro: {
-			dld_quyuan: game.dedent`
+			dld_quyuan: ui.joint`
 				${xutou}屈原（约前340年～前278年），芈姓（一作嬭姓），屈氏，名平，字原，又自云名正则，字灵均，
-				出生于楚国丹阳秭归（今湖北省宜昌市），战国时期楚国诗人、政治家。楚武王熊通之子屈瑕的后代（一说屈氏的来源是西周前期的楚国人屈紃）。
-				<br>${xutou}屈原少年时受过良好的教育，博闻强识，志向远大。早年受楚怀王信任，任左徒、三闾大夫，兼管内政外交大事。
-				提倡“美政”，主张对内举贤任能，修明法度，对外力主联齐抗秦。因遭贵族排挤诽谤，被先后流放至汉北和沅湘流域。
-				前278年，楚国郢都被秦军攻破后，自沉于汨罗江，以身殉楚国。
-				<br>${xutou}屈原是中国历史上一位伟大的爱国诗人，中国浪漫主义文学的奠基人，“楚辞”的创立者和代表作家，开辟了“香草美人”的传统，
-				被誉为“楚辞之祖”，楚国有名的辞赋家宋玉、唐勒、景差都受到屈原的影响。
-				屈原作品的出现，标志着中国诗歌进入了一个由大雅歌唱到浪漫独创的新时代，其主要作品有《离骚》《九歌》《九章》《天问》等。
-				以屈原作品为主体的《楚辞》是中国浪漫主义文学的源头之一，对后世诗歌产生了深远影响。成为中国文学史上的璀璨明珠，
-				“逸响伟辞，卓绝一世”。“路漫漫其修远兮，吾将上下而求索”，屈原的“求索”精神，成为后世仁人志士所信奉和追求的一种高尚精神。
+					出生于楚国丹阳秭归（今湖北省宜昌市），战国时期楚国诗人、政治家。
+					楚武王熊通之子屈瑕的后代（一说屈氏的来源是西周前期的楚国人屈紃）。
+				<br>${xutou}屈原少年时受过良好的教育，博闻强识，志向远大。
+					早年受楚怀王信任，任左徒、三闾大夫，兼管内政外交大事。
+					提倡“美政”，主张对内举贤任能，修明法度，对外力主联齐抗秦。
+					因遭贵族排挤诽谤，被先后流放至汉北和沅湘流域。
+					前278年，楚国郢都被秦军攻破后，自沉于汨罗江，以身殉楚国。
+				<br>${xutou}屈原是中国历史上一位伟大的爱国诗人，中国浪漫主义文学的奠基人，
+					“楚辞”的创立者和代表作家，开辟了“香草美人”的传统，被誉为“楚辞之祖”，
+					楚国有名的辞赋家宋玉、唐勒、景差都受到屈原的影响。
+					屈原作品的出现，标志着中国诗歌进入了一个由大雅歌唱到浪漫独创的新时代，其主要作品有《离骚》《九歌》《九章》《天问》等。
+					以屈原作品为主体的《楚辞》是中国浪漫主义文学的源头之一，对后世诗歌产生了深远影响，成为中国文学史上的璀璨明珠。
+					“逸响伟辞，卓绝一世”。
+					“路漫漫其修远兮，吾将上下而求索”，屈原的“求索”精神，成为后世仁人志士所信奉和追求的一种高尚精神。
 				<br>${xutou}1953年，在屈原逝世2230周年之际，世界和平理事会通过决议，确定屈原为当年纪念的世界四大文化名人之一。
 			`,
 		},
-		characterTitle: {
-		},
+		characterTitle: {},
 		characterFilter: {},
 		skill: {
 			dlds_wentian: {
 				audio: 'dcqiusuo2.mp3',
 				works: {
-					'离骚': game.dedent`
+					离骚: game.dedent`
 						帝高阳之苗裔兮，朕皇考曰伯庸。
 						摄提贞于孟陬兮，惟庚寅吾以降。
 						皇览揆余初度兮，肇锡余以嘉名。
@@ -231,7 +234,7 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 						国无人莫我知兮，又何怀乎故都！
 						既莫足与为美政兮，吾将从彭咸之所居！
 					`,
-					'天问': game.dedent`
+					天问: game.dedent`
 						曰：遂古之初，谁传道之？
 						上下未形，何由考之？
 						冥昭瞢暗，谁能极之？
@@ -420,7 +423,7 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 						吾告堵敖以不长。
 						何试上自予，忠名弥彰？
 					`,
-					'九歌': game.dedent`
+					九歌: game.dedent`
 						东皇太一
 						吉日兮辰良，穆将愉兮上皇；
 						抚长剑兮玉珥，璆锵鸣兮琳琅；
@@ -575,7 +578,8 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 				},
 				init(player) {
 					player.storage.dlds_wentian = {};
-					let works = ['离骚', '天问', '九歌'], names = get.nameList(player);
+					let works = ['离骚', '天问', '九歌'],
+						names = get.nameList(player);
 					lib.translate.dlda_wentian_info = '';
 					for (let work of works) {
 						let skills = [];
@@ -593,7 +597,7 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 				},
 				trigger: { player: 'useCard1' },
 				filter(event, player) {
-					return !event.targets || !event.targets.some(i => player !== i);
+					return !event.targets || !event.targets.some((i) => player !== i);
 				},
 				forced: true,
 				derivation: 'dlda_wentian',
@@ -601,9 +605,14 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 					let list = ['离骚'];
 					if (get.isLuckyStar(player) || get.rand(3) < 2) list.push('天问');
 					if (get.isLuckyStar(player) || get.rand(3) < 1) list.push('九歌');
-					const result = await player.chooseControl(list).set('prompt', '问天：请选择一部作品').set('ai', () => {
-						return get.event('choice');
-					}).set('choice', list.at(-1)).forResult();
+					const result = await player
+						.chooseControl(list)
+						.set('prompt', '问天：请选择一部作品')
+						.set('ai', () => {
+							return get.event('choice');
+						})
+						.set('choice', list.at(-1))
+						.forResult();
 					if (result.control) {
 						player.popup(result.control);
 						await game.asyncDelayx();
@@ -611,19 +620,25 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 						if (!skill || player.hasSkill(skill)) {
 							player.chat('无计可施吗');
 							game.log(player, '#y问天失败');
-						}
-						else {
+						} else {
 							player.popup(skill);
 							player.addTempSkill(skill, { player: 'phaseUseBegin' });
 						}
 					}
-				}
+				},
 			},
 			dlds_zhaohun: {
 				audio: ['dclisao1.mp3', 'dcqiusuo1.mp3'],
 				init() {
 					_status.dld_zhaohun = [
-						'yxs_baosi', 'yxs_bole', 'yxs_goujian', 'yxs_guiguzi', 'yxs_luban', 'yxs_meixi', 'yxs_mozi', 'yxs_sunwu'
+						'yxs_baosi',
+						'yxs_bole',
+						'yxs_goujian',
+						'yxs_guiguzi',
+						'yxs_luban',
+						'yxs_meixi',
+						'yxs_mozi',
+						'yxs_sunwu',
 					];
 					game.broadcastAll((list) => {
 						for (let i in list) {
@@ -655,26 +670,42 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 					if (player.getStorage('dlds_zhaohun').length < 9) return;
 					player.storage.dlds_zhaohun = [];
 					player.markSkill('dlds_zhaohun');
-					let name = _status.dld_zhaohun.filter(i => {
-						return !game.hasPlayer(cur => {
-							return [cur.name1, cur.name2].includes(i);
-						});
-					}).randomGet();
+					let name = _status.dld_zhaohun
+						.filter((i) => {
+							return !game.hasPlayer((cur) => {
+								return [cur.name1, cur.name2].includes(i);
+							});
+						})
+						.randomGet();
 					if (!name) {
 						player.chat('无魂可招吗');
 						game.log(player, '#y招魂失败');
 						return;
 					}
 					game.log(player, '招回了', '#y' + get.translation(name), '的魂魄');
-					let result = await player.chooseTarget('招魂：选择' + get.translation(name) + '要附身的角色', true)
-						.set('prompt2', get.character(name, 3).map(i => {
-							return (lib.translate[i] || '无名技能') + '：' + get.skillInfoTranslation(i);
-						}).join('<br>'))
-						.set('ai', target => {
-							let att = get.attitude(get.event('player'), target), th = get.threaten(target);
-							if (att * (get.event('ss') - target.getSkills(null, false, false).filter(i => {
-								return lib.translate[i] && lib.translate[i + '_info'] && lib.skill[i] && !lib.skill[i].fixed;
-							}).length) < 0) return -100;
+					let result = await player
+						.chooseTarget('招魂：选择' + get.translation(name) + '要附身的角色', true)
+						.set(
+							'prompt2',
+							get
+								.character(name, 3)
+								.map((i) => {
+									return (lib.translate[i] || '无名技能') + '：' + get.skillInfoTranslation(i);
+								})
+								.join('<br>')
+						)
+						.set('ai', (target) => {
+							let att = get.attitude(get.event('player'), target),
+								th = get.threaten(target);
+							if (
+								att *
+									(get.event('ss') -
+										target.getSkills(null, false, false).filter((i) => {
+											return lib.translate[i] && lib.translate[i + '_info'] && lib.skill[i] && !lib.skill[i].fixed;
+										}).length) <
+								0
+							)
+								return -100;
 							if (att > 0) return att / (1 + Math.abs(th - 1));
 							return (1 - att) * (1 + Math.abs(th - 1));
 						})
@@ -683,19 +714,20 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 					if (result.bool) {
 						let target = result.targets[0];
 						player.logSkill('dlds_zhaohun_fushen', target);
-						if (target.name2 != undefined) result = await target.chooseControl(target.name1, target.name2)
-							.set('prompt', '请选择要更换为' + get.translation(name) + '的武将牌')
-							.forResult();
+						if (target.name2 != undefined)
+							result = await target
+								.chooseControl(target.name1, target.name2)
+								.set('prompt', '请选择要更换为' + get.translation(name) + '的武将牌')
+								.forResult();
 						else result = { control: target.name1 };
 						target.addSkill('dlds_zhaohun_relieved');
 						if (target.storage.dlds_zhaohun_relieved[result.control]) {
 							target.storage.dlds_zhaohun_relieved[name] = [
 								game.countPlayer(),
-								target.storage.dlds_zhaohun_relieved[result.control][1]
+								target.storage.dlds_zhaohun_relieved[result.control][1],
 							];
 							delete target.storage.dlds_zhaohun_relieved[result.control];
-						}
-						else target.storage.dlds_zhaohun_relieved[name] = [game.countPlayer(), result.control];
+						} else target.storage.dlds_zhaohun_relieved[name] = [game.countPlayer(), result.control];
 						await target.reinitCharacter(result.control, name);
 					}
 				},
@@ -727,7 +759,7 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 				subSkill: {
 					die: {
 						trigger: {
-							global: 'dieAfter'
+							global: 'dieAfter',
 						},
 						silent: true,
 						charlotte: true,
@@ -735,13 +767,13 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 							if (lib.character[trigger.player.name1]) _status.dld_zhaohun.add(trigger.player.name1);
 							if (lib.character[trigger.player.name2]) _status.dld_zhaohun.add(trigger.player.name2);
 						},
-						sub: true
+						sub: true,
 					},
 					fushen: {
 						audio: 'dclisao2.mp3',
 						charlotte: true,
 						skillAnimation: true,
-						animationColor: 'water'
+						animationColor: 'water',
 					},
 					relieved: {
 						init(player) {
@@ -751,7 +783,7 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 							delete player.storage.dlds_zhaohun_relieved;
 						},
 						trigger: {
-							global: 'phaseEnd'
+							global: 'phaseEnd',
 						},
 						silent: true,
 						charlotte: true,
@@ -766,9 +798,9 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 								}
 							}
 							if (!have) player.removeSkill('dlds_zhaohun_relieved');
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			dlds_juanlv: {
 				inherit: 'cixiong_skill',
@@ -780,13 +812,12 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 					effect: {
 						player_use(card, player, target) {
 							if (player.differentSexFrom(target)) return [1, 1];
-						}
-					}
-				}
-			}
+						},
+					},
+				},
+			},
 		},
-		dynamicTranslate: {
-		},
+		dynamicTranslate: {},
 		translate: {
 			dld: '大乱斗',
 			dragon_boat: '<font color=#008000>端午节专属</font>',
@@ -794,40 +825,39 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 			dld_quyuan: '屈平',
 			dld_quyuan_ab: '屈原',
 			dlds_wentian: '问天',
-			dlds_wentian_info: game.dedent`
+			dlds_wentian_info: ui.joint`
 				锁定技，你使用牌时，若此牌没有指定其他角色为目标，你从系统随机给出的作品中选择一部作品，
 				你随机获得一项该作品中包含的技能名的技能直到你下个出牌阶段开始。
 			`,
 			dlda_wentian: '〖问天〗技能池',
-			dlda_wentian_info: game.dedent`
+			dlda_wentian_info: ui.joint`
 				<br>《<font color=#FFFF00>离骚</font>》：
-				八龙[clanbalong]、调度[diaodu]、调度[spdiaodu]、调度[mbdiaodu]、调度[xindiaodu]、苟得[olgoude]、吉占[oljizhan]、
-				兰芷[lanzhi]、论道[nhlundao]、落英[luoying]、落英[reluoying]、求索[dcqiusuo]、先驱[xianqu]、谣诼[scsyaozhuo]、
-				<font color=#FF0000>止息[rezhixi]、止息[new_zhixi]、止息[mbzhixi]</font>、
-				<font color=#8DD8FF>乱[luan]、圣[sheng]、风[feng]</font>
+					八龙[clanbalong]、调度[diaodu]、调度[spdiaodu]、调度[mbdiaodu]、调度[xindiaodu]、苟得[olgoude]、吉占[oljizhan]、
+					兰芷[lanzhi]、论道[nhlundao]、落英[luoying]、落英[reluoying]、求索[dcqiusuo]、先驱[xianqu]、谣诼[scsyaozhuo]、
+					<font color=#FF0000>止息[rezhixi]、止息[new_zhixi]、止息[mbzhixi]</font>、
+					<font color=#8DD8FF>乱[luan]、圣[sheng]、风[feng]</font>
 				<br>《<font color=#FFFF00>天问</font>》：
-				朝争[jsrgchaozheng]、天命[tianming]、阴阳[yinyang]、
-				<font color=#FF0000>伏匿[jsrgfuni]</font>、
-				<font color=#FFFF00>辅弼[mjfubi]、辅弼[refubi]、辅弼[fubi]</font>、
-				<font color=#8DD8FF>不死[busi]、乱[luan]、圣[sheng]</font>
-				<br>《<font color=#FFFF00>九歌</font>》：
-				蔽日[biri]、短兵[duanbing]、短兵[reduanbing]、短兵[dddduanbing]、飞扬[olfeiyang]、飞扬[jsrgfeiyang]、灵怒[lingnu]、
-				灵偃[lingyan]、霓裳[nichang]、先驱[xianqu]、媵予[dcyingyu]、阴阳[yinyang]、
-				<font color=#8DD8FF>风[feng]</font>
+					朝争[jsrgchaozheng]、天命[tianming]、阴阳[yinyang]、
+					<font color=#FF0000>伏匿[jsrgfuni]</font>、
+					<font color=#FFFF00>辅弼[mjfubi]、辅弼[refubi]、辅弼[fubi]</font>、
+					<font color=#8DD8FF>不死[busi]、乱[luan]、圣[sheng]</font>
+					<br>《<font color=#FFFF00>九歌</font>》：
+					蔽日[biri]、短兵[duanbing]、短兵[reduanbing]、短兵[dddduanbing]、飞扬[olfeiyang]、飞扬[jsrgfeiyang]、灵怒[lingnu]、
+					灵偃[lingyan]、霓裳[nichang]、先驱[xianqu]、媵予[dcyingyu]、阴阳[yinyang]、
+					<font color=#8DD8FF>风[feng]</font>
 				<br>其中，<font color=#FF0000>红字技能</font>有负面效果，<font color=#FFFF00>黄字技能</font>为无效技能，
-				<font color=#8DD8FF>蓝字技能</font>单机时可能不会遇到。
+					<font color=#8DD8FF>蓝字技能</font>单机时可能不会遇到。
 			`,
 			dlds_zhaohun: '招魂',
-			dlds_zhaohun_info: game.dedent`
+			dlds_zhaohun_info: ui.joint`
 				锁定技，有点数的牌进入弃牌堆后，若其中包含你未记录过的小于10的点数，你记录之。
 				然后若你记录了至少9个点数，清除所有记录并随机“招魂”一张武将牌，你令一名角色将一张武将牌更换为此武将牌直至下X个回合结束
 				（X为存活角色数+1）。
 			`,
-			dlds_zhaohun_append: game.dedent`
+			dlds_zhaohun_append: ui.joint`
 				<span style="font-family:yuanli">可“招魂”武将：褒姒、伯乐、勾践、鬼谷子、鲁班、妺喜、墨子、孙武和阵亡武将</span>
 			`,
 			dlds_zhaohun_fushen: '招魂',
 		},
-	}
-	return dld;
+	};
 });

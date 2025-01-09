@@ -29,13 +29,13 @@ export function precontent(config, pack) {
 	if (lib.config.extension_大乱斗_changelog !== lib.extensionPack.大乱斗.version)
 		game.showChangeLog = function () {
 			let str = [
-				dedent`
-				<center>
-					<span style="color: #00FFFF">更新日期</span>：
-					24年<span style="color: #00FFB0">12</span>月<span style="color: #FF0000">9</span>日
-				</center>`,
-				'◆修复初次导入bug',
-				'◆修复开局执行函数覆写无效bug',
+				ui.joint`
+					<center>
+						<span style="color: #00FFFF">更新日期</span>：
+						25年<span style="color: #00FFB0">1</span>月<span style="color: #FF0000">9</span>日
+					</center>
+				`,
+				'◆添加ui.joint，格式化长文本',
 				'◆格式化代码',
 			];
 			let ul = document.createElement('ul');
@@ -130,8 +130,15 @@ export function precontent(config, pack) {
 								color: 'rgb(255, 255, 200)',
 								'font-size': '13px',
 								'text-align': 'center',
-								background:
-									'linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0.4) 60%, transparent 100%)',
+								background: ui.joint`
+									linear-gradient(
+										to right, 
+										transparent 0%, 
+										rgba(0, 0, 0, 0.4) 40%, 
+										rgba(0, 0, 0, 0.4) 60%, 
+										transparent 100%
+									)
+								`,
 								'z-index': 87,
 							});
 						if (typeof target.node.gainSkill.gain !== 'function')
@@ -175,8 +182,15 @@ export function precontent(config, pack) {
 								color: 'rgb(255, 255, 200)',
 								'font-size': '13px',
 								'text-align': 'center',
-								background:
-									'linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0.4) 60%, transparent 100%)',
+								background: ui.joint`
+									linear-gradient(
+										to right, 
+										transparent 0%, 
+										rgba(0, 0, 0, 0.4) 40%, 
+										rgba(0, 0, 0, 0.4) 60%, 
+										transparent 100%
+									)
+								`,
 								'z-index': 87,
 							});
 						if (typeof target.node.gainSkill.lose !== 'function')
@@ -227,7 +241,7 @@ export function precontent(config, pack) {
 		game.prompt(`请输入要加入/移出${name}的${two ? '两个' : ''}技能ID${two ? '（用空格分开）' : ''}`, (str) => {
 			if (typeof str !== 'string') return;
 			let show = (info) => {
-					temp.innerHTML = dedent`${info}`;
+					temp.innerHTML = ui.joint`${info}`;
 					temp.ready = true;
 					setTimeout(() => {
 						temp.innerHTML = '编辑' + name;
@@ -368,7 +382,7 @@ export function precontent(config, pack) {
 		</html>`;
 		const List = ui.create.div(
 			'',
-			dedent`
+			ui.joint`
 				<div style="z-index:114514">
 					<iframe width="${w}px" height="${h}px" srcdoc="<!DOCTYPE html>${info}"></iframe>
 				</div>
@@ -377,7 +391,7 @@ export function precontent(config, pack) {
 		);
 		ui.create.div(
 			'',
-			dedent`
+			ui.joint`
 				<div style="height: 10px; width: ${w}px; text-align: center; z-index: 114514">
 					<font size="5em">关闭</font>
 				</div>
@@ -405,12 +419,12 @@ export function precontent(config, pack) {
 					zhu: 'color: #E983FF',
 				}[type] || '';
 		if (type === 'zhu')
-			info = dedent`
+			info = ui.joint`
 				<div class="skill">${lib.translate[skill]}</div>
 				<div>${lib.translate[skill + '_info']}
 			`;
 		else
-			info = dedent`
+			info = ui.joint`
 				<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
 					<span style="font-weight: bold; ${color}">
 						${lib.translate[skill]}
@@ -425,7 +439,7 @@ export function precontent(config, pack) {
 			if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation;
 			else derivation = [lib.skill[skill].derivation];
 			for (let der of derivation) {
-				info += dedent`
+				info += ui.joint`
 					<br><span class="thundertext">
 						${lib.translate[der]}：${lib.translate[der + '_info']}
 					</span>
@@ -433,6 +447,11 @@ export function precontent(config, pack) {
 			}
 		}
 		return info + '</div>';
+	};
+	ui.joint = function (strings, ...values) {
+		let str = strings.reduce((acc, str, i) => acc + str + (values[i - 1] || ''), '');
+		let lines = str.split('\n').map((line) => line.trimStart());
+		return lines.join('').trim();
 	};
 	game.dedent = function (strings, ...values) {
 		// 将模板字符串和插值值组合成一个完整的字符串
@@ -839,7 +858,7 @@ export function precontent(config, pack) {
 					event.skills.map((skill, i) => {
 						return [
 							skill,
-							dedent`
+							ui.joint`
 								<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
 									<span class="greentext">
 										${lib.translate[skill]}
@@ -1146,7 +1165,7 @@ export function precontent(config, pack) {
 				.map((skill, i) => {
 					return [
 						skill,
-						dedent`
+						ui.joint`
 							<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
 								<span style="color: #FFFF00; font-weight: bold">
 									${lib.translate[skill]}
@@ -1559,7 +1578,7 @@ export function precontent(config, pack) {
 					.set(
 						'choiceList',
 						skills.map(
-							(i) => dedent`
+							(i) => ui.joint`
 								<div class="skill" style="color:#FFFF00">${lib.translate[i]}</div>
 								<div>${get.skillInfoTranslation(i, target)}</div>
 							`
