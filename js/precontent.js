@@ -32,11 +32,14 @@ export function precontent(config, pack) {
 				ui.joint`
 					<center>
 						<span style="color: #00FFFF">更新日期</span>：
-						25年<span style="color: #00FFB0">1</span>月<span style="color: #FF0000">9</span>日
+						25年<span style="color: #00FFB0">1</span>月<span style="color: #FF0000">19</span>日
 					</center>
 				`,
-				'◆添加ui.joint，格式化长文本',
-				'◆格式化代码',
+				'◆添加个人常驻技能池配置备用',
+				'◆修复ui.joint',
+				'◆［技能审批］支持暂不批阅',
+				'◆更新部分陈旧描述',
+				'◆其他细节优化',
 			];
 			let ul = document.createElement('ul');
 			ul.style.textAlign = 'left';
@@ -448,11 +451,23 @@ export function precontent(config, pack) {
 		}
 		return info + '</div>';
 	};
+	/**
+	 * 伪连接字符串，去掉换行和行前空串
+	 * @param { TemplateStringsArray } strings 模板字符串
+	 * @param  { ...any } values 插值
+	 * @returns { string }
+	 */
 	ui.joint = function (strings, ...values) {
-		let str = strings.reduce((acc, str, i) => acc + str + (values[i - 1] || ''), '');
+		let str = strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
 		let lines = str.split('\n').map((line) => line.trimStart());
 		return lines.join('').trim();
 	};
+	/**
+	 * 去除模板字符串的公共缩进
+	 * @param { TemplateStringsArray } strings 模板字符串
+	 * @param  { ...any } values 插值
+	 * @returns { string }
+	 */
 	game.dedent = function (strings, ...values) {
 		// 将模板字符串和插值值组合成一个完整的字符串
 		let str = strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
@@ -481,7 +496,7 @@ export function precontent(config, pack) {
 			lib.config.all.characters.push('dld');
 		},
 		() => {
-			alert('error:〈大乱斗〉扩展武将导入失败');
+			alert('Error:《大乱斗》扩展武将导入失败');
 		}
 	);
 	lib.arenaReady.push(function () {
@@ -534,6 +549,270 @@ export function precontent(config, pack) {
 			);
 			alert('《大乱斗》配置载入成功！进入游戏后请手动重启游戏');
 			return;
+		}
+		if (lib.config.extension_大乱斗_common.length < 2 * lib.config.extension_大乱斗_nrsc) {
+			if (confirm('是否导入157的常驻技能池配置？取消则自动关闭常驻技能池（可于扩展设置中重新开启）'))
+				game.saveExtensionConfig('大乱斗', 'common', [
+					'wangxi',
+					'jianxiong',
+					'fankui',
+					'guicai',
+					'luoyi',
+					'tiandu',
+					'olsbzhuri',
+					'jyzongshi',
+					'olxuanfeng',
+					'olsbduoshou',
+					'lunshi',
+					'diezhang',
+					'fazhu',
+					'spshidi',
+					'spyishi',
+					'spqishe',
+					'mbaosi',
+					'rende',
+					'paoxiao',
+					'wusheng',
+					'guanxing',
+					'longdan',
+					'zhiheng',
+					'qixi',
+					'keji',
+					'kurou',
+					'xiaoji',
+					'reyicong',
+					'xinfu_jiyuan',
+					'olsbdouchan',
+					'olsbhetao',
+					'dclihuo',
+					'olmiji',
+					'olsbqiwu',
+					'olenyuan',
+					'olzongshi',
+					'olganlu',
+					'olrenxin',
+					'oltousui',
+					'bingxin',
+					'ybzhuiji',
+					'canmou',
+					'congjian',
+					'xianwan',
+					'caozhao',
+					'olxibing',
+					'zhongyun',
+					'shenpin',
+					'ciwei',
+					'qingleng',
+					'jyishi',
+					'tairan',
+					'sanchen',
+					'clanyunshen',
+					'clanlianzhu',
+					'jianchu',
+					'xinkuanggu',
+					'xinshensu',
+					'guidao',
+					'kanpo',
+					'quhu',
+					'jieming',
+					'dimeng',
+					'fangquan',
+					'guzheng',
+					'beige',
+					'qizhi',
+					'nzry_juzhan',
+					'nzry_chenglve',
+					'nzry_jianxiang',
+					'drlt_qianjie',
+					'drlt_xiongluan',
+					'drlt_congjian',
+					'dcwanglie',
+					'olliangyin',
+					'olkongsheng',
+					'huituo',
+					'remingjian',
+					'olzhijian',
+					'olguzheng',
+					'rejiqiao',
+					'qiangzhi',
+					'reluoying',
+					'dcjiushi',
+					'dcfaen',
+					'remingce',
+					'reqice',
+					'oljieming',
+					'dcyicong',
+					'reyanyu',
+					'rewansha',
+					'reweimu',
+					'relongyin',
+					'shifei',
+					'changbiao',
+					'rejueqing',
+					'reshenduan',
+					'reyonglve',
+					'reduodao',
+					'reanjian',
+					'zhenlie',
+					'miji',
+					'reqianxi',
+					'decadepojun',
+					'hanzhan',
+					'rezhiman',
+					'rejiaojin',
+					'xingongji',
+					'decadezhenjun',
+					'ollihuo',
+					'xinyaoming',
+					'ollianhuan',
+					'xinganlu',
+					'refankui',
+					'reguicai',
+					'reganglie',
+					'new_qingjian',
+					'ollongdan',
+					'olyajiao',
+					'new_rewusheng',
+					'reyingzi',
+					'new_yijue',
+					'refanjian',
+					'reguose',
+					'new_liyu',
+					'rerende',
+					'reqingguo',
+					'reguanxing',
+					'xinguidao',
+					'xinjiewei',
+					'fenji',
+					'rejianchu',
+					'xinenyuan',
+					'luoying',
+					'jiushi',
+					'xinjujian',
+					'faen',
+					'shibei',
+					'olbingyi',
+					'dangxian',
+					'longyin',
+					'mingjian',
+					'lihuo',
+					'jigong',
+					'jishe',
+					'qingxian',
+					'jianzheng',
+					'tianbian',
+					'funan',
+					'olkanpo',
+					'oljiuchi',
+					'dcshibei',
+					'decadejingce',
+					'reluanji',
+					'shenxing',
+					'reshenxing',
+					'xinshenxing',
+					'twgyshenxing',
+					'jdsbzhiheng',
+					'fumian',
+					'olzhuyan',
+					'yuanzi',
+					'zengou',
+					'zlshoufu',
+					'yongsi',
+					'shenxian',
+					'qiangwu',
+					'liangzhu',
+					'kaikang',
+					'mozhi',
+					'yuhua',
+					'twyuhua',
+					'qirang',
+					'twqirang',
+					'remumu',
+					'fentian',
+					'jugu',
+					'hongde',
+					'sheyan',
+					'olxiaoxi',
+					'zlhuji',
+					'jiangchi',
+					'rejiangchi',
+					'xinjiangchi',
+					'new_jiangchi',
+					'xinxuanbei',
+					'xinfu_qinguo',
+					'xinfu_weilu',
+					'xinfu_duanfa',
+					'xinfu_guanchao',
+					'xinfu_xunxian',
+					'lirang',
+					'qinbao',
+					'boyan',
+					'dcjiexing',
+					'dchuace',
+					'dcpeiqi',
+					'renzheng',
+					'dcposuo',
+					'dcpandi',
+					'moukui',
+					'dcmoukui',
+					'twmoukui',
+					'dczhengxu',
+					'dcbeifen',
+					'nifu',
+					'fuqi',
+					'refuqi',
+					'rewenji',
+					'xinhongyan',
+					'rejuece',
+					'xiaoxi_hansui',
+					'xinjyzongshi',
+					'rezongshi',
+					'yingjian',
+					'rongbei',
+					'fengjie',
+					'spyinju',
+					'twqiaosi',
+					'twrouke',
+					'twzhenliang',
+					'twkuanji',
+					'twchungang',
+					'zhenshan',
+					'twxiangyu',
+					'zhengfu',
+					'dcfaqi',
+					'psguanxing',
+					'shushen',
+					'stdshushen',
+					'dcshushen',
+					'spshude',
+					'yjxuepin',
+					'vtbyanli',
+					'yjzhenlve',
+					'zhenlue',
+					'jsrgshenchong',
+					'jie',
+					'jsrgzhenqiao',
+					'jsrgxundao',
+					'jsrgzhiheng',
+					'jsrgguanjue',
+					'jsrgguiji',
+					'liangji',
+					'dddxuyu',
+					'nslingying',
+					'nsfuge',
+					'nszhenyin',
+					'yuiko_fenglun',
+					'fuhun',
+					'yanxiao',
+					'fuji',
+					'sptaoluan',
+					'xinfu_limu',
+					'xuxie',
+					'xfenxin',
+					'xianwei',
+					'dcliying',
+				]);
+			else game.saveExtensionConfig('大乱斗', 'nrsc', 0);
 		}
 		if (get.mode() === 'guozhan') return;
 		_status.daluandou_characters = {};
@@ -694,7 +973,7 @@ export function precontent(config, pack) {
 			try {
 				eval(lib.config.extension_大乱斗_ief);
 			} catch (e) {
-				alert('运行开局执行函数时出现错误：' + e + '请立即停止游戏检查错误');
+				alert('运行开局执行函数时出现错误：' + e + '\n请立即停止游戏检查错误');
 				func = async function (player, configs) {};
 			}
 			game.me.addTempSkill('dld_init');
@@ -1682,12 +1961,15 @@ export function precontent(config, pack) {
 				return;
 			}
 			do {
-				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
-				lib.config.extension_大乱斗_check.addArray(skills);
+				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills),
+					bool;
 				for (let name of ['common', 'disabled', 'tret']) {
 					let result = await player
 						.chooseButton([
-							`选择要添加到${trans[name]}的技能，剩余技能将${name === 'tret' ? '作为普通技能' : '进行其他技能池的筛选'}`,
+							ui.joint`
+								选择要添加到${trans[name]}的技能，剩余技能将${name === 'tret' ? '作为普通技能' : '进行其他技能池的筛选'}
+								<br>一直点“取消”则暂不批阅
+							`,
 							[
 								skills.map((s, i) => {
 									return [s, get.dldSkillButton(s, name)];
@@ -1696,18 +1978,22 @@ export function precontent(config, pack) {
 							],
 						])
 						.set('ai', () => 0)
-						.set('selectButton', [1, skills.length])
+						.set('selectButton', [!bool && name === 'tret' ? 0 : 1, skills.length])
 						.set('complexSelect', false)
 						.forResult();
 					if (result.bool) {
+						bool = true;
+						skills.removeArray(result.links);
 						lib.config['extension_大乱斗_' + name].addArray(result.links);
 						game.saveExtensionConfig('大乱斗', name, lib.config['extension_大乱斗_' + name]);
-						skills.removeArray(result.links);
 						if (!skills.length) break;
 					}
 				}
+				if (bool) {
+					lib.config.extension_大乱斗_check.addArray(skills);
+				}
 				if (!allSkills.length) {
-					alert('当前将池技能已批阅完毕！');
+					alert('当前将池技能已全部批阅完毕！');
 					break;
 				}
 			} while (confirm('是否继续批阅？（剩余' + allSkills.length + '项技能未批阅）'));

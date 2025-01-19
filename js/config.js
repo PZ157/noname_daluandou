@@ -31,7 +31,7 @@ export let config = {
 						<br><br>不建议开启本扩展的同时游玩替补模式、塔防模式等；
 							由于本扩展开启时会清空所有武将牌上的技能，如需查看武将技能ID请先关闭此扩展并重启游戏；
 							也可以使用《全能搜索》查找对应技能ID。
-						<br><br>bug反馈、功能建议、技能池反馈、联机游玩等可加<font color=#FFFF00>Q群392157644</font>。
+						<br><br>bug反馈、功能建议、技能池更新、联机游玩等可加<font color=#FFFF00>Q群392157644</font>。
 							获取本体最新测试包、素材分享、扩展分享等也可以加。
 					</span>
 					<br><br>非常感谢您对本扩展的认可和支持！
@@ -161,9 +161,11 @@ export let config = {
 				node = container,
 				config =
 					lib.config.extension_大乱斗_ief ||
-					`func = async function (player, configs) {
-
-					};`;
+					dedent`
+						func = async function (player, configs) {
+							
+						};
+					`;
 			node.code = config;
 			ui.window.classList.add('shortcutpaused');
 			ui.window.classList.add('systempaused');
@@ -176,11 +178,11 @@ export let config = {
 						eval(code);
 						if (Object.prototype.toString.call(func) !== '[object AsyncFunction]') throw 'typeError';
 					} catch (e) {
-						if (e == 'typeError') alert('类型不为[object AsyncFunction]');
+						if (e == 'typeError') alert('类型不为[object AsyncFunction]，请勿修改原结构');
 						else alert('代码语法有错误，请仔细检查（' + e + '）');
 						return;
 					}
-					game.saveExtensionConfig('大乱斗', 'ief', 'func = ' + func);
+					game.saveExtensionConfig('大乱斗', 'ief', code);
 					ui.window.classList.remove('shortcutpaused');
 					ui.window.classList.remove('systempaused');
 					container.delete();
@@ -247,17 +249,16 @@ export let config = {
 		name: '内奸加成',
 		intro: dedent`
 			填写“1”“2”等字符，即可激活对应序号技能。
-			<br>每局各限一次：
-			<br>①<font color=#8D9CFF>不臣之心</font>：内奸于出牌阶段可以亮明身份加1点体力上限，然后可以选择与主公各回复1点体力。
+			<br>每局各限一次，内奸可亮明身份发动下列技能：
+			<br>①<font color=#8D9CFF>不臣之心</font>：出牌阶段，内奸可以加1点体力上限，然后可以选择与主公各回复1点体力。
 			<br>②<font color=#8D9CFF>野心毕露</font>：出牌阶段，内奸可以移除场上一名其他角色的一项技能。
 		`,
 		init: '12',
 		input: true,
 		onblur: function (e) {
-			let text = e.target,
-				count = [];
+			let text = e.target;
 			if (!text.innerText.length) text.innerText = 'off';
-			else if (text.innerText === 'true' || text.innerText === 'on') text.innerText = '123';
+			else if (text.innerText === 'true' || text.innerText === 'on') text.innerText = '12';
 			game.saveExtensionConfig('大乱斗', 'neiBuff', text.innerText);
 		},
 	},
@@ -361,7 +362,7 @@ export let config = {
 	},
 	fixTime: {
 		name: '延长选技能时长',
-		intro: '将联机模式按照大乱斗规则选择技能时的时长按照对应选项延长，避免看不过来。均以出牌时限为基准调整',
+		intro: '将联机模式因本扩展规则选择技能的时长按照对应选项延长，避免看不过来。均以出牌时限为基准调整',
 		init: 'x6',
 		item: {
 			off: '关闭',
@@ -376,7 +377,7 @@ export let config = {
 	},
 	filterSkills: {
 		name: '技能审批',
-		intro: '开启后，每次单机游戏开始时，系统都会给玩家提供设定量的未“审批”的技能供玩家快速分类',
+		intro: '开启后，每次单机游戏开始时，系统都会给玩家提供相应数量的未“审批”的技能供玩家快速划分到各类技能池中',
 		init: 0,
 		input: true,
 		onblur: function (e) {
@@ -394,7 +395,7 @@ export let config = {
 		onclick: function () {
 			let txt = '{';
 			for (let i in lib.config) {
-				if (!i.indexOf('extension_大乱斗_'))
+				if (i.indexOf('extension_大乱斗_') === 0)
 					txt += '\r	' + i.slice(14) + ' : ' + JSON.stringify(lib.config[i]).replace('\n', '\r') + ',';
 			}
 			txt += '\r}';
@@ -415,14 +416,13 @@ export let config = {
 		clear: true,
 		onclick: function () {
 			let container = ui.create.div('.popup-container.editor');
-			let editorpage = ui.create.div(container);
 			let node = container;
 			let str = '//完整粘贴你保存的大乱斗配置到等号右端\r_status.dld_config = ';
 			node.code = str;
 			ui.window.classList.add('shortcutpaused');
 			ui.window.classList.add('systempaused');
 			let saveInput = function () {
-				let code, j;
+				let code;
 				if (container.editor) code = container.editor.getValue();
 				else if (container.textarea) code = container.textarea.value;
 				try {
