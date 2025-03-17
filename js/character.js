@@ -583,12 +583,12 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 					lib.translate.dlda_wentian_info = '';
 					for (let work of works) {
 						let skills = [];
-						lib.translate.dlda_wentian_info += '<br>《' + work + '》：';
+						lib.translate.dlda_wentian_info += '<br><font color=#00FF00>《' + work + '》</font>：';
 						for (let k in lib.skill) {
 							let info = lib.translate[k];
 							if (info && lib.skill.dlds_wentian.works[work].includes(info) && !lib.filter.skillDisabled(k, names)) {
 								skills.push(k);
-								if (lib.translate.dlda_wentian_info.at(-1) != '：') lib.translate.dlda_wentian_info += '、';
+								if (lib.translate.dlda_wentian_info.at(-1) !== '：') lib.translate.dlda_wentian_info += '、';
 								lib.translate.dlda_wentian_info += info + '[' + k + ']';
 							}
 						}
@@ -714,7 +714,7 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 					if (result.bool) {
 						let target = result.targets[0];
 						player.logSkill('dlds_zhaohun_fushen', target);
-						if (target.name2 != undefined)
+						if (target.name2 !== undefined)
 							result = await target
 								.chooseControl(target.name1, target.name2)
 								.set('prompt', '请选择要更换为' + get.translation(name) + '的武将牌')
@@ -831,21 +831,21 @@ game.import('character', (lib, game, ui, get, ai, _status) => {
 			`,
 			dlda_wentian: '〖问天〗技能池',
 			dlda_wentian_info: ui.joint`
-				<br>《<font color=#FFFF00>离骚</font>》：
+				<br><font color=#00FF00>《离骚》</font>：
 					八龙[clanbalong]、调度[diaodu]、调度[spdiaodu]、调度[mbdiaodu]、调度[xindiaodu]、苟得[olgoude]、吉占[oljizhan]、
 					兰芷[lanzhi]、论道[nhlundao]、落英[luoying]、落英[reluoying]、求索[dcqiusuo]、先驱[xianqu]、谣诼[scsyaozhuo]、
 					<font color=#FF0000>止息[rezhixi]、止息[new_zhixi]、止息[mbzhixi]</font>、
 					<font color=#8DD8FF>乱[luan]、圣[sheng]、风[feng]</font>
-				<br>《<font color=#FFFF00>天问</font>》：
+				<br><font color=#00FF00>《天问》</font>：
 					朝争[jsrgchaozheng]、天命[tianming]、阴阳[yinyang]、
 					<font color=#FF0000>伏匿[jsrgfuni]</font>、
 					<font color=#FFFF00>辅弼[mjfubi]、辅弼[refubi]、辅弼[fubi]</font>、
 					<font color=#8DD8FF>不死[busi]、乱[luan]、圣[sheng]</font>
-					<br>《<font color=#FFFF00>九歌</font>》：
+				<br><font color=#00FF00>《九歌》</font>：
 					蔽日[biri]、短兵[duanbing]、短兵[reduanbing]、短兵[dddduanbing]、飞扬[olfeiyang]、飞扬[jsrgfeiyang]、灵怒[lingnu]、
 					灵偃[lingyan]、霓裳[nichang]、先驱[xianqu]、媵予[dcyingyu]、阴阳[yinyang]、
 					<font color=#8DD8FF>风[feng]</font>
-				<br>其中，<font color=#FF0000>红字技能</font>有负面效果，<font color=#FFFF00>黄字技能</font>为无效技能，
+				<br><br>其中，<font color=#FF0000>红字技能</font>有负面效果，<font color=#FFFF00>黄字技能</font>为无效技能，
 					<font color=#8DD8FF>蓝字技能</font>单机时可能不会遇到。
 			`,
 			dlds_zhaohun: '招魂',

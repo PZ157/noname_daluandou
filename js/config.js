@@ -1,5 +1,4 @@
-import { lib, game, ui, get, ai, _status } from '../../../noname.js';
-import dedent from '../../../game/dedent.js';
+import { lib, game, ui, get, ai, _status } from './utils.js';
 
 export let config = {
 	bd1: {
@@ -83,7 +82,7 @@ export let config = {
 	github: {
 		name: '<font color=#FF9244>点我复制本扩展GitHub仓库链接</font>',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			let textarea = document.createElement('textarea');
 			textarea.setAttribute('readonly', 'readonly');
 			textarea.value = 'https://github.com/PZ157/noname_daluandou';
@@ -104,7 +103,7 @@ export let config = {
 		name: '默认候选技能总数',
 		init: 15,
 		input: true,
-		onblur: function (e) {
+		onblur(e) {
 			let text = e.target,
 				num = Number(text.innerText);
 			if (isNaN(num)) num = 15;
@@ -119,7 +118,7 @@ export let config = {
 		name: '默认可选技能数',
 		init: 2,
 		input: true,
-		onblur: function (e) {
+		onblur(e) {
 			let text = e.target,
 				num = Number(text.innerText);
 			if (isNaN(num)) num = 2;
@@ -134,7 +133,7 @@ export let config = {
 		intro: '请以“体力值/体力上限/护甲值”的格式填写',
 		init: '4/4/0',
 		input: true,
-		onblur: function (e) {
+		onblur(e) {
 			let text = e.target,
 				arr = text.innerText
 					.split('/')
@@ -156,12 +155,12 @@ export let config = {
 	editIef: {
 		name: '开局执行函数（<font color=#FF0000>新手慎用！</font>）',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			let container = ui.create.div('.popup-container.editor'),
 				node = container,
 				config =
 					lib.config.extension_大乱斗_ief ||
-					dedent`
+					game.dedent`
 						func = async function (player, configs) {
 							
 						};
@@ -169,32 +168,31 @@ export let config = {
 			node.code = config;
 			ui.window.classList.add('shortcutpaused');
 			ui.window.classList.add('systempaused');
-			let func,
-				saveInput = function () {
-					let code;
-					if (container.editor) code = container.editor.getValue();
-					else if (container.textarea) code = container.textarea.value;
-					try {
-						eval(code);
-						if (Object.prototype.toString.call(func) !== '[object AsyncFunction]') throw 'typeError';
-					} catch (e) {
-						if (e == 'typeError') alert('类型不为[object AsyncFunction]，请勿修改原结构');
-						else alert('代码语法有错误，请仔细检查（' + e + '）');
-						return;
-					}
-					game.saveExtensionConfig('大乱斗', 'ief', code);
-					ui.window.classList.remove('shortcutpaused');
-					ui.window.classList.remove('systempaused');
-					container.delete();
-					container.code = code;
-					delete window.saveNonameInput;
-				};
+			let saveInput = function () {
+				let code, func;
+				if (container.editor) code = container.editor.getValue();
+				else if (container.textarea) code = container.textarea.value;
+				try {
+					eval(code);
+					if (Object.prototype.toString.call(func) !== '[object AsyncFunction]') throw 'typeError';
+				} catch (e) {
+					if (e === 'typeError') alert('类型不为[object AsyncFunction]，请勿修改原结构');
+					else alert('代码语法有错误，请仔细检查（' + e + '）');
+					return;
+				}
+				game.saveExtensionConfig('大乱斗', 'ief', code);
+				ui.window.classList.remove('shortcutpaused');
+				ui.window.classList.remove('systempaused');
+				container.delete();
+				container.code = code;
+				delete window.saveNonameInput;
+			};
 			window.saveNonameInput = saveInput;
 			let editor = ui.create.editor(container, saveInput);
 			if (node.aced) {
 				ui.window.appendChild(node);
 				node.editor.setValue(node.code, 1);
-			} else if (lib.device == 'ios') {
+			} else if (lib.device === 'ios') {
 				ui.window.appendChild(node);
 				if (!node.textarea) {
 					let textarea = document.createElement('textarea');
@@ -213,11 +211,25 @@ export let config = {
 			}
 		},
 	},
+	skillAI: {
+		name: '人机选技能AI策略',
+		intro: ui.joint`
+			顺序选择：按照选项顺序由上到下选技能至选满。
+			<br>随机选取：从选项中随机选取技能至选满。
+			<br>skillRank方法：用get.skillRank方法判断技能价值，择优选取，直至选满（负收益技能不选）
+		`,
+		init: 'order',
+		item: {
+			order: '顺序选择',
+			random: '随机选取',
+			skillRank: 'skillRank方法',
+		},
+	},
 	nrsc: {
 		name: '默认常驻技能候选数量',
 		init: 5,
 		input: true,
-		onblur: function (e) {
+		onblur(e) {
 			let text = e.target,
 				num = Number(text.innerText);
 			if (isNaN(num)) num = 5;
@@ -230,7 +242,7 @@ export let config = {
 	},
 	zhuSkill: {
 		name: '主公技',
-		intro: dedent`
+		intro: ui.joint`
 			开局随机分配：
 			<br>明主身份局，选初始技能前，系统会随机分配一个主公所选势力的主公技。
 			<br>暗主身份局，一名角色的回合结束时，若主公已亮明身份，主公从至多三项同势力主公技中选择一项获得之。
@@ -247,7 +259,7 @@ export let config = {
 	},
 	neiBuff: {
 		name: '内奸加成',
-		intro: dedent`
+		intro: ui.joint`
 			填写“1”“2”等字符，即可激活对应序号技能。
 			<br>每局各限一次，内奸可亮明身份发动下列技能：
 			<br>①<font color=#8D9CFF>不臣之心</font>：出牌阶段，内奸可以加1点体力上限，然后可以选择与主公各回复1点体力。
@@ -255,7 +267,7 @@ export let config = {
 		`,
 		init: '12',
 		input: true,
-		onblur: function (e) {
+		onblur(e) {
 			let text = e.target;
 			if (!text.innerText.length) text.innerText = 'off';
 			else if (text.innerText === 'true' || text.innerText === 'on') text.innerText = '12';
@@ -307,56 +319,56 @@ export let config = {
 	viewGoods: {
 		name: '查看常驻技能池',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.viewDldList('common', '常驻技能池');
 		},
 	},
 	editGoods: {
 		name: '编辑常驻技能池',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.editDldList(this, 'common', '常驻技能池');
 		},
 	},
 	viewUseless: {
 		name: '查看禁选技能池',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.viewDldList('disabled', '禁选技能池');
 		},
 	},
 	editUseless: {
 		name: '编辑禁选技能池',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.editDldList(this, 'disabled', '禁选技能池');
 		},
 	},
 	viewGroup: {
 		name: '查看禁配技能对',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.viewDldList('group', '禁配技能对');
 		},
 	},
 	editGroup: {
 		name: '编辑禁配技能对',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.editDldList(this, 'group', '禁配技能对');
 		},
 	},
 	viewTret: {
 		name: '查看添头技能池',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.viewDldList('tret', '添头技能池');
 		},
 	},
 	editTret: {
 		name: '编辑添头技能池',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			game.editDldList(this, 'tret', '添头技能池');
 		},
 	},
@@ -380,7 +392,7 @@ export let config = {
 		intro: '开启后，每次单机游戏开始时，系统都会给玩家提供相应数量的未“审批”的技能供玩家快速划分到各类技能池中',
 		init: 0,
 		input: true,
-		onblur: function (e) {
+		onblur(e) {
 			let text = e.target,
 				num = Number(text.innerText);
 			if (isNaN(num) || num < 0) num = 0;
@@ -392,7 +404,7 @@ export let config = {
 	exportPz: {
 		name: '复制本扩展配置',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			let txt = '{';
 			for (let i in lib.config) {
 				if (i.indexOf('extension_大乱斗_') === 0)
@@ -414,7 +426,7 @@ export let config = {
 	loadPz: {
 		name: '载入本扩展配置',
 		clear: true,
-		onclick: function () {
+		onclick() {
 			let container = ui.create.div('.popup-container.editor');
 			let node = container;
 			let str = '//完整粘贴你保存的大乱斗配置到等号右端\r_status.dld_config = ';
@@ -449,7 +461,7 @@ export let config = {
 			if (node.aced) {
 				ui.window.appendChild(node);
 				node.editor.setValue(node.code, 1);
-			} else if (lib.device == 'ios') {
+			} else if (lib.device === 'ios') {
 				ui.window.appendChild(node);
 				if (!node.textarea) {
 					let textarea = document.createElement('textarea');

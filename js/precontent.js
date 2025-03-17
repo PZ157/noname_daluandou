@@ -1,5 +1,4 @@
-import { lib, game, ui, get, ai, _status } from '../../../noname.js';
-import dedent from '../../../game/dedent.js';
+import { lib, game, ui, get, ai, _status } from './utils.js';
 
 export function precontent(config, pack) {
 	{
@@ -7,9 +6,7 @@ export function precontent(config, pack) {
 			noname = lib.version
 				.split('.')
 				.slice(2)
-				.map((i) => {
-					return Number(i);
-				}),
+				.map((i) => Number(i)),
 			len = Math.min(noname.length, min.length),
 			status = false;
 		if (lib.version.slice(0, 5) === '1.10.')
@@ -32,14 +29,12 @@ export function precontent(config, pack) {
 				ui.joint`
 					<center>
 						<span style="color: #00FFFF">更新日期</span>：
-						25年<span style="color: #00FFB0">1</span>月<span style="color: #FF0000">19</span>日
+						2025年<span style="color: #00FFB0">3</span>月<span style="color: #FF0000">17</span>日
 					</center>
 				`,
-				'◆添加个人常驻技能池配置备用',
-				'◆修复ui.joint',
-				'◆［技能审批］支持暂不批阅',
-				'◆更新部分陈旧描述',
-				'◆其他细节优化',
+				'◆新增［人机选技能AI策略］功能',
+				'◆用自定义方法代替原来的dedent，并将扩展内所有自定义方法集成到utils.js',
+				'◆琐碎细节优化',
 			];
 			let ul = document.createElement('ul');
 			ul.style.textAlign = 'left';
@@ -88,8 +83,8 @@ export function precontent(config, pack) {
 		if (info.forbid && info.forbid.includes(mode)) return true;
 		if (info.mode && !info.mode.includes(mode)) return true;
 		if (info.available && info.available(mode) === false) return true;
-		if (info.viewAs && typeof info.viewAs != 'function') {
-			if (typeof info.viewAs == 'string')
+		if (info.viewAs && typeof info.viewAs !== 'function') {
+			if (typeof info.viewAs === 'string')
 				info.viewAs = {
 					name: info.viewAs,
 				};
@@ -145,7 +140,7 @@ export function precontent(config, pack) {
 								'z-index': 87,
 							});
 						if (typeof target.node.gainSkill.gain !== 'function')
-							target.node.gainSkill.gain = function (skill) {
+							target.node.gainSkill.gain = (skill) => {
 								if (!this.skills) this.skills = [];
 								if (this.skills.includes(skill) || !lib.translate[skill] || this.innerHTML.includes(lib.translate[skill]))
 									return;
@@ -197,7 +192,7 @@ export function precontent(config, pack) {
 								'z-index': 87,
 							});
 						if (typeof target.node.gainSkill.lose !== 'function')
-							target.node.gainSkill.lose = function (skill) {
+							target.node.gainSkill.lose = (skill) => {
 								if (!this.skills) return;
 								const index = this.skills.indexOf(skill);
 								if (index === -1) return;
@@ -215,280 +210,6 @@ export function precontent(config, pack) {
 				return skill;
 			}
 		};
-	/**
-	 * 大乱斗技能不足弹窗
-	 * @param { string } [str] 弹窗内容
-	 */
-	game.dldLessAlert = (str) => {
-		if (_status.dld_less) return;
-		_status.dld_less = true;
-		if (str) {
-			alert(str);
-			return;
-		}
-		let tnsc = lib.config.extension_大乱斗_tnsc,
-			nsc = lib.config.extension_大乱斗_nsc;
-		if (_status.daluandou_skills.length < game.players.length * tnsc) alert('技能池太小，建议增加武将或减少候选技能数');
-		else if (tnsc / nsc > 0.7) alert('可选技能数过多，建议减少可选技能数');
-		else if (tnsc < 8) alert('候选技能数太少，建议增加候选技能数');
-		else alert('禁配技能对过多，建议删除不必要的禁配或增加候选技能数');
-	};
-	/**
-	 * 编辑大乱斗技能池
-	 * @param { HTMLDivElement } temp 当前HTML
-	 * @param { string } config 配置名
-	 * @param { string } name 技能池名称
-	 */
-	game.editDldList = (temp, config, name) => {
-		let two = config === 'group';
-		game.prompt(`请输入要加入/移出${name}的${two ? '两个' : ''}技能ID${two ? '（用空格分开）' : ''}`, (str) => {
-			if (typeof str !== 'string') return;
-			let show = (info) => {
-					temp.innerHTML = ui.joint`${info}`;
-					temp.ready = true;
-					setTimeout(() => {
-						temp.innerHTML = '编辑' + name;
-						delete temp.ready;
-					}, 1600);
-				},
-				skills = str.split(' ').slice(0, 2);
-			if (!skills.length) return;
-			for (let i of skills) {
-				if (!lib.skill[i])
-					return show(`
-						<div style="color: rgb(255,0,0); font-family: xinwei; font-size: 113%">
-							未找到${i}对应技能
-						</div>
-					`);
-				if (lib.filter.skillDisabled(i, null, true))
-					return show(`
-						<div style="color: rgb(255,0,0); font-family: xinwei; font-size: 113%">
-							${i}已被禁用
-						</div>
-					`);
-			}
-			let lists = lib.config['extension_大乱斗_' + config] || [];
-			if (two) {
-				let find = false;
-				for (let i = 0; i < lists.length; i++) {
-					if (skills.includes(lists[i][0]) && (skills.length === 1 || skills.includes(lists[i][1]))) {
-						lists.splice(i--, 1);
-						find = true;
-					}
-				}
-				if (!find && skills.length === 2) {
-					if (skills[0] === skills[1])
-						return show(`
-							<div style="color: rgb(255,255,0); font-family: xinwei; font-size: 113%">
-								请输入两个不同的技能ID！
-							</div>
-						`);
-					lists.push(skills);
-					show(`
-						<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
-							已将【${lib.translate[skills[0]]}】＋【${lib.translate[skills[1]]}】加入${name}
-						</div>
-					`);
-				} else if (skills.length === 1 || skills[0] === skills[1])
-					show(`
-						<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
-							已将【${lib.translate[skills[0]]}】相关的技能对移出${name}
-						</div>
-					`);
-				else
-					show(`
-						<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
-							已将【${lib.translate[skills[0]]}】＋【${lib.translate[skills[1]]}】移出${name}
-						</div>
-					`);
-			} else if (lists.includes(skills[0])) {
-				lists.remove(skills[0]);
-				show(`
-					<div style="color: rgb(210,210,000); font-family: xinwei; font-size: 113%">
-						已将【${lib.translate[skills[0]]}】移出${name}
-					</div>
-				`);
-			} else {
-				lists.push(skills[0]);
-				show(`
-					<div style="color: rgb(255,97,3); font-family: xinwei; font-size: 113%">
-						已将【${lib.translate[skills[0]]}】加入${name}
-					</div>
-				`);
-			}
-			game.saveExtensionConfig('大乱斗', config, lists);
-		});
-	};
-	/**
-	 * 查看大乱斗技能池
-	 * @param { string } config 配置名
-	 * @param { string } name 技能池名称
-	 */
-	game.viewDldList = (config, name) => {
-		/** 改自《手杀UI》和《群英荟萃》 */
-		let h = document.body.offsetHeight,
-			w = document.body.offsetWidth,
-			lists = lib.config['extension_大乱斗_' + config] || [],
-			skills = '',
-			two = config === 'group';
-		if (lists.length > 0)
-			for (let i = 0; i < lists.length; i++) {
-				if (i) skills += '、';
-				if (two) {
-					if (lib.translate[lists[i][0]]) skills += lib.translate[lists[i][0]];
-					skills += '[' + lists[i][0] + ']＋';
-					if (lib.translate[lists[i][1]]) skills += lib.translate[lists[i][1]];
-					skills += '[' + lists[i][1] + ']';
-				} else skills += (lib.translate[lists[i]] || '无名技能') + '[' + lists[i] + ']';
-			}
-		else skills = '暂无技能';
-		let info = `<html><head>
-			<meta charset='utf-8'>
-			<style type='text/css'>
-				body {
-					background-image: url('${lib.assetURL}extension/大乱斗/image/beijing.png');
-					background-size: 100% 100%;
-					background-position: center;
-					--w: 560px;
-					--h: calc(var(--w) * 610/1058);
-					width: var(--w);
-					height: var(--h);
-					background-repeat: no-repeat;
-					background-attachment: fixed;
-				}
-				h1 {
-					text-shadow:1px 1px 1PX #000000,1px -1px 1PX #000000,-1px 1px 1PX #000000,-1px -1px 1PX #000000;
-					font-size:20px
-				}
-				div {
-					width: 160vmin;
-					height: 80vmin;
-					border: 0 solid black;
-					border-radius: 9px;
-					padding: 15px;
-					margin: 6.3vmin 5.5vmin 5.5vmin 15.5vmin;
-				}
-				div.ex1 {
-					width: 160vmin;
-					height: 80vmin;
-					overflow: auto;
-					font-size: 24px
-				}
-			</style>
-			</head>
-			<body>
-				<div class='ex1'>
-					<center><b>${name}</b></center>
-					${skills}
-				</div>
-			</body>
-		</html>`;
-		const List = ui.create.div(
-			'',
-			ui.joint`
-				<div style="z-index:114514">
-					<iframe width="${w}px" height="${h}px" srcdoc="<!DOCTYPE html>${info}"></iframe>
-				</div>
-			`,
-			ui.window
-		);
-		ui.create.div(
-			'',
-			ui.joint`
-				<div style="height: 10px; width: ${w}px; text-align: center; z-index: 114514">
-					<font size="5em">关闭</font>
-				</div>
-			`,
-			List,
-			function () {
-				List.delete();
-			}
-		);
-	};
-	/**
-	 * 获取技能在type技能池下的按钮内容
-	 * @param { string } skill 技能ID
-	 * @param { string } [type] 技能池类型
-	 * @returns { string }
-	 */
-	get.dldSkillButton = (skill, type) => {
-		let info,
-			color =
-				{
-					normal: 'color: #00FF00',
-					common: 'color: #FFFF00',
-					disabled: 'color: #FF0000',
-					tret: 'color: #8DFDD8',
-					zhu: 'color: #E983FF',
-				}[type] || '';
-		if (type === 'zhu')
-			info = ui.joint`
-				<div class="skill">${lib.translate[skill]}</div>
-				<div>${lib.translate[skill + '_info']}
-			`;
-		else
-			info = ui.joint`
-				<div class="popup text" style="width: calc(100% - 10px); display: inline-block">
-					<span style="font-weight: bold; ${color}">
-						${lib.translate[skill]}
-					</span>
-					：${lib.translate[skill + '_info']}
-			`;
-		if (lib.translate[skill + '_append']) {
-			info += `<br><span class="firetext">${lib.translate[skill + '_append']}</span>`;
-		}
-		if (lib.skill[skill].derivation) {
-			let derivation;
-			if (Array.isArray(lib.skill[skill].derivation)) derivation = lib.skill[skill].derivation;
-			else derivation = [lib.skill[skill].derivation];
-			for (let der of derivation) {
-				info += ui.joint`
-					<br><span class="thundertext">
-						${lib.translate[der]}：${lib.translate[der + '_info']}
-					</span>
-				`;
-			}
-		}
-		return info + '</div>';
-	};
-	/**
-	 * 伪连接字符串，去掉换行和行前空串
-	 * @param { TemplateStringsArray } strings 模板字符串
-	 * @param  { ...any } values 插值
-	 * @returns { string }
-	 */
-	ui.joint = function (strings, ...values) {
-		let str = strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
-		let lines = str.split('\n').map((line) => line.trimStart());
-		return lines.join('').trim();
-	};
-	/**
-	 * 去除模板字符串的公共缩进
-	 * @param { TemplateStringsArray } strings 模板字符串
-	 * @param  { ...any } values 插值
-	 * @returns { string }
-	 */
-	game.dedent = function (strings, ...values) {
-		// 将模板字符串和插值值组合成一个完整的字符串
-		let str = strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
-		// 将字符串按行分割
-		let lines = str.split('\n');
-		// 找到最小的非空行缩进
-		let minIndent = null;
-		lines.forEach((line) => {
-			if (line.trim() === '') return; // 跳过空行
-			let indent = line.length - line.trimStart().length;
-			if (minIndent === null || indent < minIndent) {
-				minIndent = indent;
-			}
-		});
-		// 如果没有找到非空行，直接返回原字符串
-		if (minIndent === null) return str;
-		// 去除每行的最小公共缩进
-		lines = lines.map((line) => line.slice(minIndent));
-		// 重新组合成一个字符串
-		return lines.join('\n').trim();
-	};
 	lib.init.js(
 		lib.assetURL + 'extension/大乱斗/js/character.js',
 		null,
@@ -499,7 +220,7 @@ export function precontent(config, pack) {
 			alert('Error:《大乱斗》扩展武将导入失败');
 		}
 	);
-	lib.arenaReady.push(function () {
+	lib.arenaReady.push(() => {
 		if (!Array.isArray(lib.config.extension_大乱斗_check)) game.saveExtensionConfig('大乱斗', 'check', []);
 		if (!Array.isArray(lib.config.extension_大乱斗_common)) game.saveExtensionConfig('大乱斗', 'common', []);
 		if (!Array.isArray(lib.config.extension_大乱斗_disabled)) game.saveExtensionConfig('大乱斗', 'disabled', []);
@@ -509,7 +230,7 @@ export function precontent(config, pack) {
 			game.saveExtensionConfig(
 				'大乱斗',
 				'ief',
-				dedent`
+				game.dedent`
 					func = async function (player, configs) {
 						const mode = get.mode(),
 							isZhu = function (current) {
@@ -551,7 +272,7 @@ export function precontent(config, pack) {
 			return;
 		}
 		if (lib.config.extension_大乱斗_common.length < 2 * lib.config.extension_大乱斗_nrsc) {
-			if (confirm('是否导入157的常驻技能池配置？取消则自动关闭常驻技能池（可于扩展设置中重新开启）'))
+			if (confirm('是否导入157的常驻技能池配置(2024年9月更新)？\n取消则自动关闭常驻技能池（可于扩展设置中重新开启）'))
 				game.saveExtensionConfig('大乱斗', 'common', [
 					'wangxi',
 					'jianxiong',
@@ -1011,7 +732,7 @@ export function precontent(config, pack) {
 		superCharlotte: true,
 		ruleSkill: true,
 		async setAllotSkills(lists) {
-			if (Object.keys(lists).length == 0) return;
+			if (Object.keys(lists).length === 0) return;
 			game.broadcastAll((lists) => {
 				lib.skill._dld_start.toLoad({
 					allotSkills: lists,
@@ -1264,7 +985,12 @@ export function precontent(config, pack) {
 		selectSkills(target, skills) {
 			let choice = [];
 			let num = Math.min(skills.length, target.storage.dld.nsc);
-			//skills.sort((a, b) => get.skillRank(b) - get.skillRank(a));
+			switch (lib.config.extension_大乱斗_skillAI) {
+				case 'random':
+					skills.randomSort();
+				case 'skillRank':
+					skills.sort((a, b) => get.skillRank(b) - get.skillRank(a));
+			}
 			for (let i of skills) {
 				let can = true;
 				for (let arr of lib.config.extension_大乱斗_group) {
@@ -1468,9 +1194,19 @@ export function precontent(config, pack) {
 				[list, 'textbutton'],
 			]);
 			next.set('forced', true);
-			next.set('ai', (button) => {
-				return get.skillRank(button.link);
-			});
+			next.set(
+				'ai',
+				(() => {
+					switch (lib.config.extension_大乱斗_skillAI) {
+						case 'random':
+							return () => Math.random();
+						case 'skillRank':
+							return (button) => get.skillRank(button.link);
+						default:
+							return () => 1;
+					}
+				})()
+			);
 			next.set('selectButton', [_status.dld_config.started || _status.dld_config.enableTret === 'off' ? max : 0, max]);
 			next.set('filterButton', (button) => {
 				for (let arr of get.event('group')) {
@@ -1539,6 +1275,19 @@ export function precontent(config, pack) {
 			}
 			return skills;
 		},
+		selectSkills(target, skills, num) {
+			switch (lib.config.extension_大乱斗_skillAI) {
+				case 'random':
+					return () => skills.randomGets(num);
+				case 'skillRank':
+					return skills
+						.map((i) => [i, get.skillRank(i)])
+						.sort((a, b) => b[1] - a[1])
+						.slice(0, num);
+				default:
+					return skills.slice(0, num);
+			}
+		},
 		async content(event, trigger, player) {
 			let next;
 			const send = (skills, target, num, stop) => {
@@ -1593,7 +1342,7 @@ export function precontent(config, pack) {
 				for (let target of ai_targets) {
 					sendback(
 						{
-							links: skillsMap[target.playerid].randomGets(target.storage.dld.tret),
+							links: lib.skill.dld_tret.selectSkills(target, skillsMap[target.playerid], target.storage.dld.tret),
 							ai: true,
 						},
 						target
@@ -1679,9 +1428,19 @@ export function precontent(config, pack) {
 				return;
 			}
 			let next = event.target.chooseButton(['选择获得至多' + get.cnNumber(max) + '项添头技', [list, 'textbutton']]);
-			next.set('ai', (button) => {
-				return get.skillRank(button.link);
-			});
+			next.set(
+				'ai',
+				(() => {
+					switch (lib.config.extension_大乱斗_skillAI) {
+						case 'random':
+							return () => Math.random();
+						case 'skillRank':
+							return (button) => get.skillRank(button.link);
+						default:
+							return () => 1;
+					}
+				})()
+			);
 			next.set('selectButton', [1, max]);
 			next.set('filterButton', (button) => {
 				for (let arr of get.event('group')) {
@@ -1735,13 +1494,23 @@ export function precontent(config, pack) {
 					.chooseControl(list)
 					.set(
 						'choiceList',
-						list.map((i) => {
-							return get.dldSkillButton(i, 'zhu');
-						})
+						list.map((i) => get.dldSkillButton(i, 'zhu'))
 					)
 					.set('prompt', '选择要获得的一项主公技')
 					.set('displayIndex', false)
-					.set('ai', () => 0)
+					.set('ai', () => get.event('idx'))
+					.set(
+						'idx',
+						(() => {
+							switch (lib.config.extension_大乱斗_skillAI) {
+								case 'skillRank':
+									const skillRank = list.map((i) => get.skillRank(i));
+									return skillRank.indexOf(Math.max(...skillRank));
+								default:
+									return () => 0;
+							}
+						})()
+					)
 					.forResult();
 			else return;
 			player.popup(result.control);
@@ -1868,7 +1637,7 @@ export function precontent(config, pack) {
 					.set('ai', () => get.event('idx'))
 					.set(
 						'idx',
-						(function () {
+						(() => {
 							if (skills.length === 1) return 0;
 							let good = [],
 								normal = [],
