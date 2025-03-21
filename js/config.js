@@ -83,16 +83,7 @@ export let config = {
 		name: '<font color=#FF9244>点我复制本扩展GitHub仓库链接</font>',
 		clear: true,
 		onclick() {
-			let textarea = document.createElement('textarea');
-			textarea.setAttribute('readonly', 'readonly');
-			textarea.value = 'https://github.com/PZ157/noname_daluandou';
-			document.body.appendChild(textarea);
-			textarea.select();
-			if (document.execCommand('copy')) {
-				document.execCommand('copy');
-				alert('已成功复制到剪切板。国内访问不稳定，可能需要代理');
-			} else alert('复制失败，请稍后重试');
-			document.body.removeChild(textarea);
+			game.copy('https://github.com/PZ157/noname_daluandou', '已成功复制到剪切板。国内访问不稳定，可能需要代理/加速器');
 		},
 	},
 	tip: {
@@ -411,16 +402,7 @@ export let config = {
 					txt += '\r	' + i.slice(14) + ' : ' + JSON.stringify(lib.config[i]).replace('\n', '\r') + ',';
 			}
 			txt += '\r}';
-			let textarea = document.createElement('textarea');
-			textarea.setAttribute('readonly', 'readonly');
-			textarea.value = txt;
-			document.body.appendChild(textarea);
-			textarea.select();
-			if (document.execCommand('copy')) {
-				document.execCommand('copy');
-				alert('大乱斗配置已成功复制到剪切板，请您及时粘贴保存');
-			} else alert('复制失败，建议稍后重试');
-			document.body.removeChild(textarea);
+			game.copy(txt, '『大乱斗』配置已成功复制到剪切板，请您及时粘贴保存');
 		},
 	},
 	loadPz: {
@@ -429,7 +411,7 @@ export let config = {
 		onclick() {
 			let container = ui.create.div('.popup-container.editor');
 			let node = container;
-			let str = '//完整粘贴你保存的大乱斗配置到等号右端\r_status.dld_config = ';
+			let str = '//完整粘贴你保存的『大乱斗』配置到等号右端\r_status.dld_config = ';
 			node.code = str;
 			ui.window.classList.add('shortcutpaused');
 			ui.window.classList.add('systempaused');

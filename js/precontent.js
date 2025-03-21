@@ -18,7 +18,7 @@ export function precontent(config, pack) {
 			}
 		else status = '检测到游戏大版本号与本扩展支持的版本号不同';
 		if (typeof status === 'string') {
-			alert(status + '，为避免版本不兼容产生不必要的问题，已为您关闭《大乱斗》扩展，稍后自动重启游戏');
+			alert(status + '，为避免版本不兼容产生不必要的问题，已为您关闭『大乱斗』扩展，稍后自动重启游戏');
 			game.saveExtensionConfig('大乱斗', 'enable', false);
 			game.reload();
 		}
@@ -29,12 +29,12 @@ export function precontent(config, pack) {
 				ui.joint`
 					<center>
 						<span style="color: #00FFFF">更新日期</span>：
-						2025年<span style="color: #00FFB0">3</span>月<span style="color: #FF0000">17</span>日
+						2025年<span style="color: #00FFB0">3</span>月<span style="color: #FF0000">21</span>日
 					</center>
 				`,
-				'◆新增［人机选技能AI策略］功能',
-				'◆用自定义方法代替原来的dedent，并将扩展内所有自定义方法集成到utils.js',
-				'◆琐碎细节优化',
+				'◆修缮编辑大乱斗技能池和［技能审批］的相关功能，现在通过扩展设置界面的编辑常驻/禁选/添头技能池时会自动标记为已批阅技能了',
+				'◆一直点“取消”将不再继续询问是否继续批阅技能',
+				'◆其他细节优化',
 			];
 			let ul = document.createElement('ul');
 			ul.style.textAlign = 'left';
@@ -217,7 +217,7 @@ export function precontent(config, pack) {
 			lib.config.all.characters.push('dld');
 		},
 		() => {
-			alert('Error:《大乱斗》扩展武将导入失败');
+			alert('Error:『大乱斗』扩展武将导入失败');
 		}
 	);
 	lib.arenaReady.push(() => {
@@ -268,12 +268,12 @@ export function precontent(config, pack) {
 					};
 				`
 			);
-			alert('《大乱斗》配置载入成功！进入游戏后请手动重启游戏');
+			alert('『大乱斗』配置载入成功！进入游戏后请手动重启游戏');
 			return;
 		}
 		if (lib.config.extension_大乱斗_common.length < 2 * lib.config.extension_大乱斗_nrsc) {
-			if (confirm('是否导入157的常驻技能池配置(2024年9月更新)？\n取消则自动关闭常驻技能池（可于扩展设置中重新开启）'))
-				game.saveExtensionConfig('大乱斗', 'common', [
+			if (confirm('是否导入157的常驻技能池配置(2024年9月更新)？\n取消则自动关闭常驻技能池（可于扩展设置中重新开启）')) {
+				const common = [
 					'wangxi',
 					'jianxiong',
 					'fankui',
@@ -532,8 +532,53 @@ export function precontent(config, pack) {
 					'xfenxin',
 					'xianwei',
 					'dcliying',
-				]);
-			else game.saveExtensionConfig('大乱斗', 'nrsc', 0);
+				];
+				game.saveExtensionConfig('大乱斗', 'common', common);
+				game.saveExtensionConfig('大乱斗', 'group', common);
+				alert('157的常驻技能池配置已成功载入！这些技能将不会加入技能审批');
+			} else game.saveExtensionConfig('大乱斗', 'nrsc', 0);
+		}
+		if (lib.config.extension_大乱斗_tempCache !== 'mergedCheck' && lib.config.extension_大乱斗_filterSkills > 0) {
+			let configs = [];
+			if (
+				lib.config.extension_大乱斗_common.some((i) => {
+					return !lib.config.extension_大乱斗_check.includes(i);
+				})
+			)
+				configs.push('common');
+			if (
+				lib.config.extension_大乱斗_disabled.some((i) => {
+					return !lib.config.extension_大乱斗_check.includes(i);
+				})
+			)
+				configs.push('disabled');
+			if (
+				lib.config.extension_大乱斗_tret.some((i) => {
+					return !lib.config.extension_大乱斗_check.includes(i);
+				})
+			)
+				configs.push('tret');
+			if (configs.length) {
+				if (
+					confirm(
+						'检测到您的' +
+							configs
+								.map((config) => {
+									if (config === 'common') return '常驻';
+									if (config === 'disabled') return '禁选';
+									if (config === 'tret') return '添头';
+								})
+								.join('、') +
+							'技能池中有未被标记已批阅的技能，是否将这些技能进行标记？'
+					)
+				) {
+					lib.config.extension_大乱斗_check.addArray(lib.config.extension_大乱斗_common);
+					lib.config.extension_大乱斗_check.addArray(lib.config.extension_大乱斗_disabled);
+					lib.config.extension_大乱斗_check.addArray(lib.config.extension_大乱斗_tret);
+					game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
+				}
+				game.saveExtensionConfig('大乱斗', 'tempCache', 'mergedCheck');
+			}
 		}
 		if (get.mode() === 'guozhan') return;
 		_status.daluandou_characters = {};
@@ -1538,10 +1583,11 @@ export function precontent(config, pack) {
 				return false;
 			return _status.dld_config.neiBuff.includes('1');
 		},
-		log: false,
 		charlotte: true,
 		superCharlotte: true,
 		ruleSkill: true,
+		skillAnimation: true,
+		animationColor: 'thunder',
 		async content(event, trigger, player) {
 			lib.skill._dld_start.showYe(player);
 			lib.skill.dld_neiBuff2.prompt = '移除一名其他角色的一项技能';
@@ -1710,7 +1756,7 @@ export function precontent(config, pack) {
 		filter(event, player) {
 			return !_status.connectMode && player === game.me && lib.config.extension_大乱斗_filterSkills > 0;
 		},
-		direct: true,
+		log: false,
 		firstDo: true,
 		priority: 48,
 		charlotte: true,
@@ -1724,16 +1770,17 @@ export function precontent(config, pack) {
 					common: '<span style="color: #FFFF00">常驻技能池</span>',
 					disabled: '<span style="color: #FF0000">禁选技能池</span>',
 					tret: '<span style="color: #8DFDD8">添头技能池</span>',
-				};
+				},
+				bool;
 			if (!allSkills.length) {
 				alert('当前将池技能已批阅完毕！');
 				return;
 			}
 			do {
-				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills),
-					bool;
+				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
+				bool = false;
 				for (let name of ['common', 'disabled', 'tret']) {
-					let result = await player
+					const result = await player
 						.chooseButton([
 							ui.joint`
 								选择要添加到${trans[name]}的技能，剩余技能将${name === 'tret' ? '作为普通技能' : '进行其他技能池的筛选'}
@@ -1765,7 +1812,7 @@ export function precontent(config, pack) {
 					alert('当前将池技能已全部批阅完毕！');
 					break;
 				}
-			} while (confirm('是否继续批阅？（剩余' + allSkills.length + '项技能未批阅）'));
+			} while (bool && confirm('是否继续批阅？（剩余' + allSkills.length + '项技能未批阅）'));
 			game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
 		},
 	};

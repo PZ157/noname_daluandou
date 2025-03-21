@@ -1,6 +1,25 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
 
 /**
+ * 复制文本内容
+ * @param { string } txt 文本内容
+ * @param { string } [tip] 复制成功提示内容
+ */
+game.copy = (txt, tip = '已成功复制到剪切板，请您及时粘贴保存') => {
+	if (typeof txt !== 'string') return;
+	let textarea = document.createElement('textarea');
+	textarea.setAttribute('readonly', 'readonly');
+	textarea.value = txt;
+	document.body.appendChild(textarea);
+	textarea.select();
+	if (document.execCommand('copy')) {
+		document.execCommand('copy');
+		alert(tip);
+	} else alert('复制失败');
+	document.body.removeChild(textarea);
+};
+
+/**
  * 去除模板字符串的公共缩进
  * @param { TemplateStringsArray } strings 模板字符串
  * @param  { ...any } values 插值
@@ -27,6 +46,7 @@ game.dedent = function (strings, ...values) {
 	// 重新组合成一个字符串
 	return lines.join('\n').trim();
 };
+
 /**
  * 大乱斗技能不足弹窗
  * @param { string } [str] 弹窗内容
@@ -45,6 +65,7 @@ game.dldLessAlert = (str) => {
 	else if (tnsc < 8) alert('候选技能数太少，建议增加候选技能数');
 	else alert('禁配技能对过多，建议删除不必要的禁配或增加候选技能数');
 };
+
 /**
  * 获取技能在type技能池下的按钮内容
  * @param { string } skill 技能ID
@@ -91,6 +112,7 @@ get.dldSkillButton = (skill, type) => {
 	}
 	return info + '</div>';
 };
+
 /**
  * 编辑大乱斗技能池
  * @param { HTMLDivElement } temp 当前HTML
@@ -98,7 +120,7 @@ get.dldSkillButton = (skill, type) => {
  * @param { string } name 技能池名称
  */
 game.editDldList = (temp, config, name) => {
-	let two = config === 'group';
+	const two = config === 'group';
 	game.prompt(`请输入要加入/移出${name}的${two ? '两个' : ''}技能ID${two ? '（用空格分开）' : ''}`, (str) => {
 		if (typeof str !== 'string') return;
 		let show = (info) => {
@@ -109,7 +131,7 @@ game.editDldList = (temp, config, name) => {
 					delete temp.ready;
 				}, 1600);
 			},
-			skills = str.split(' ').slice(0, 2);
+			skills = str.split(' ').slice(0, two ? 2 : 1);
 		if (!skills.length) return;
 		for (let i of skills) {
 			if (!lib.skill[i])
@@ -168,6 +190,8 @@ game.editDldList = (temp, config, name) => {
             `);
 		} else {
 			lists.push(skills[0]);
+			lib.config.extension_大乱斗_check.add(skills[0]);
+			game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
 			show(`
                 <div style="color: rgb(255,97,3); font-family: xinwei; font-size: 113%">
                     已将【${lib.translate[skills[0]]}】加入${name}
@@ -177,6 +201,7 @@ game.editDldList = (temp, config, name) => {
 		game.saveExtensionConfig('大乱斗', config, lists);
 	});
 };
+
 /**
  * 查看大乱斗技能池
  * @param { string } config 配置名
@@ -263,6 +288,7 @@ game.viewDldList = (config, name) => {
 		}
 	);
 };
+
 /**
  * 伪连接字符串，去掉换行和行前空串
  * @param { TemplateStringsArray } strings 模板字符串
