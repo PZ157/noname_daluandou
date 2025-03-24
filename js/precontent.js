@@ -535,8 +535,50 @@ export function precontent(config, pack) {
 				];
 				game.saveExtensionConfig('大乱斗', 'common', common);
 				game.saveExtensionConfig('大乱斗', 'group', common);
-				alert('157的常驻技能池配置已成功载入！这些技能将不再加入技能审批中');
+				alert('157的常驻技能池配置已成功载入！这些技能将不会加入技能审批');
 			} else game.saveExtensionConfig('大乱斗', 'nrsc', 0);
+		}
+		if (lib.config.extension_大乱斗_tempCache !== 'checkMerged' && lib.config.extension_大乱斗_filterSkills > 0) {
+			let configs = [];
+			if (
+				lib.config.extension_大乱斗_common.some((i) => {
+					return !lib.config.extension_大乱斗_check.includes(i);
+				})
+			)
+				configs.push('common');
+			if (
+				lib.config.extension_大乱斗_disabled.some((i) => {
+					return !lib.config.extension_大乱斗_check.includes(i);
+				})
+			)
+				configs.push('disabled');
+			if (
+				lib.config.extension_大乱斗_tret.some((i) => {
+					return !lib.config.extension_大乱斗_check.includes(i);
+				})
+			)
+				configs.push('tret');
+			if (configs.length) {
+				if (
+					confirm(
+						'检测到您的' +
+							configs
+								.map((config) => {
+									if (config === 'common') return '常驻';
+									if (config === 'disabled') return '禁选';
+									if (config === 'tret') return '添头';
+								})
+								.join('、') +
+							'技能池中有未被标记已批阅的技能，是否将这些技能进行标记？'
+					)
+				) {
+					lib.config.extension_大乱斗_check.addArray(lib.config.extension_大乱斗_common);
+					lib.config.extension_大乱斗_check.addArray(lib.config.extension_大乱斗_disabled);
+					lib.config.extension_大乱斗_check.addArray(lib.config.extension_大乱斗_tret);
+					game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
+				}
+			}
+			game.saveExtensionConfig('大乱斗', 'tempCache', 'checkMerged');
 		}
 		if (get.mode() === 'guozhan') return;
 		_status.daluandou_characters = {};
@@ -1735,7 +1777,8 @@ export function precontent(config, pack) {
 				return;
 			}
 			do {
-				let skills = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
+				const check = allSkills.splice(0, lib.config.extension_大乱斗_filterSkills);
+				let skills = check.slice(0);
 				bool = false;
 				for (let name of ['common', 'disabled', 'tret']) {
 					const result = await player
@@ -1764,7 +1807,7 @@ export function precontent(config, pack) {
 					}
 				}
 				if (bool) {
-					lib.config.extension_大乱斗_check.addArray(skills);
+					lib.config.extension_大乱斗_check.addArray(check);
 				}
 				if (!allSkills.length) {
 					alert('当前将池技能已全部批阅完毕！');

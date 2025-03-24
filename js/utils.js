@@ -1,22 +1,36 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
 
 /**
- * 复制文本内容
- * @param { string } txt 文本内容
- * @param { string } [tip] 复制成功提示内容
+ * 复制文本内容到剪贴板
+ * @param { string } text - 要复制的文本
+ * @param { string | false } [success] - 成功提示语
+ * @param { string | false } [fail] - 失败提示语
+ * @returns { boolean }
  */
-game.copy = (txt, tip = '已成功复制到剪切板，请您及时粘贴保存') => {
-	if (typeof txt !== 'string') return;
-	let textarea = document.createElement('textarea');
-	textarea.setAttribute('readonly', 'readonly');
-	textarea.value = txt;
+game.copy = (text, success = '已成功复制到剪贴板', fail = '复制失败') => {
+	if (typeof text !== 'string') return;
+	let copied = false;
+	const textarea = document.createElement('textarea');
+	textarea.value = text;
+	textarea.style.position = 'fixed';
+	textarea.style.left = '-9999px';
+	textarea.style.width = '1px';
 	document.body.appendChild(textarea);
+	textarea.focus();
 	textarea.select();
-	if (document.execCommand('copy')) {
-		document.execCommand('copy');
-		alert(tip);
-	} else alert('复制失败');
+	try {
+		copied = document.execCommand('copy');
+		if (copied) {
+			success && alert(success);
+		} else {
+			fail && alert(fail);
+		}
+	} catch (e) {
+		console.error('execCommand失败:', e);
+		fail && alert(fail);
+	}
 	document.body.removeChild(textarea);
+	return copied;
 };
 
 /**
