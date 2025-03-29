@@ -29,12 +29,14 @@ export function precontent(config, pack) {
 				ui.joint`
 					<center>
 						<span style="color: #00FFFF">更新日期</span>：
-						2025年<span style="color: #00FFB0">3</span>月<span style="color: #FF0000">21</span>日
+						2025年<span style="color: #00FFB0">3</span>月<span style="color: #FF0000">29</span>日
 					</center>
 				`,
-				'◆修缮编辑大乱斗技能池和［技能审批］的相关功能，现在通过扩展设置界面的编辑常驻/禁选/添头技能池时会自动标记为已批阅技能了',
-				'◆一直点“取消”将不再继续询问是否继续批阅技能',
-				'◆其他细节优化',
+				'◆修复鏖战不受［鏖战］开关限制的严重问题',
+				'◆修复大乱斗中的添加/移除技能会显示两遍的问题',
+				'◆移除内置的过时的常驻技能池并默认关闭常驻技能候选',
+				'◆开启［技能审批］后会检查并提示玩家将已加入特殊技能池的技能标记为已批阅技能',
+				'◆更新自定义方法game.copy',
 			];
 			let ul = document.createElement('ul');
 			ul.style.textAlign = 'left';
@@ -271,274 +273,7 @@ export function precontent(config, pack) {
 			alert('『大乱斗』配置载入成功！进入游戏后请手动重启游戏');
 			return;
 		}
-		if (lib.config.extension_大乱斗_common.length < 2 * lib.config.extension_大乱斗_nrsc) {
-			if (confirm('是否导入157的常驻技能池配置(2024年9月更新)？\n取消则自动关闭常驻技能池（可于扩展设置中重新开启）')) {
-				const common = [
-					'wangxi',
-					'jianxiong',
-					'fankui',
-					'guicai',
-					'luoyi',
-					'tiandu',
-					'olsbzhuri',
-					'jyzongshi',
-					'olxuanfeng',
-					'olsbduoshou',
-					'lunshi',
-					'diezhang',
-					'fazhu',
-					'spshidi',
-					'spyishi',
-					'spqishe',
-					'mbaosi',
-					'rende',
-					'paoxiao',
-					'wusheng',
-					'guanxing',
-					'longdan',
-					'zhiheng',
-					'qixi',
-					'keji',
-					'kurou',
-					'xiaoji',
-					'reyicong',
-					'xinfu_jiyuan',
-					'olsbdouchan',
-					'olsbhetao',
-					'dclihuo',
-					'olmiji',
-					'olsbqiwu',
-					'olenyuan',
-					'olzongshi',
-					'olganlu',
-					'olrenxin',
-					'oltousui',
-					'bingxin',
-					'ybzhuiji',
-					'canmou',
-					'congjian',
-					'xianwan',
-					'caozhao',
-					'olxibing',
-					'zhongyun',
-					'shenpin',
-					'ciwei',
-					'qingleng',
-					'jyishi',
-					'tairan',
-					'sanchen',
-					'clanyunshen',
-					'clanlianzhu',
-					'jianchu',
-					'xinkuanggu',
-					'xinshensu',
-					'guidao',
-					'kanpo',
-					'quhu',
-					'jieming',
-					'dimeng',
-					'fangquan',
-					'guzheng',
-					'beige',
-					'qizhi',
-					'nzry_juzhan',
-					'nzry_chenglve',
-					'nzry_jianxiang',
-					'drlt_qianjie',
-					'drlt_xiongluan',
-					'drlt_congjian',
-					'dcwanglie',
-					'olliangyin',
-					'olkongsheng',
-					'huituo',
-					'remingjian',
-					'olzhijian',
-					'olguzheng',
-					'rejiqiao',
-					'qiangzhi',
-					'reluoying',
-					'dcjiushi',
-					'dcfaen',
-					'remingce',
-					'reqice',
-					'oljieming',
-					'dcyicong',
-					'reyanyu',
-					'rewansha',
-					'reweimu',
-					'relongyin',
-					'shifei',
-					'changbiao',
-					'rejueqing',
-					'reshenduan',
-					'reyonglve',
-					'reduodao',
-					'reanjian',
-					'zhenlie',
-					'miji',
-					'reqianxi',
-					'decadepojun',
-					'hanzhan',
-					'rezhiman',
-					'rejiaojin',
-					'xingongji',
-					'decadezhenjun',
-					'ollihuo',
-					'xinyaoming',
-					'ollianhuan',
-					'xinganlu',
-					'refankui',
-					'reguicai',
-					'reganglie',
-					'new_qingjian',
-					'ollongdan',
-					'olyajiao',
-					'new_rewusheng',
-					'reyingzi',
-					'new_yijue',
-					'refanjian',
-					'reguose',
-					'new_liyu',
-					'rerende',
-					'reqingguo',
-					'reguanxing',
-					'xinguidao',
-					'xinjiewei',
-					'fenji',
-					'rejianchu',
-					'xinenyuan',
-					'luoying',
-					'jiushi',
-					'xinjujian',
-					'faen',
-					'shibei',
-					'olbingyi',
-					'dangxian',
-					'longyin',
-					'mingjian',
-					'lihuo',
-					'jigong',
-					'jishe',
-					'qingxian',
-					'jianzheng',
-					'tianbian',
-					'funan',
-					'olkanpo',
-					'oljiuchi',
-					'dcshibei',
-					'decadejingce',
-					'reluanji',
-					'shenxing',
-					'reshenxing',
-					'xinshenxing',
-					'twgyshenxing',
-					'jdsbzhiheng',
-					'fumian',
-					'olzhuyan',
-					'yuanzi',
-					'zengou',
-					'zlshoufu',
-					'yongsi',
-					'shenxian',
-					'qiangwu',
-					'liangzhu',
-					'kaikang',
-					'mozhi',
-					'yuhua',
-					'twyuhua',
-					'qirang',
-					'twqirang',
-					'remumu',
-					'fentian',
-					'jugu',
-					'hongde',
-					'sheyan',
-					'olxiaoxi',
-					'zlhuji',
-					'jiangchi',
-					'rejiangchi',
-					'xinjiangchi',
-					'new_jiangchi',
-					'xinxuanbei',
-					'xinfu_qinguo',
-					'xinfu_weilu',
-					'xinfu_duanfa',
-					'xinfu_guanchao',
-					'xinfu_xunxian',
-					'lirang',
-					'qinbao',
-					'boyan',
-					'dcjiexing',
-					'dchuace',
-					'dcpeiqi',
-					'renzheng',
-					'dcposuo',
-					'dcpandi',
-					'moukui',
-					'dcmoukui',
-					'twmoukui',
-					'dczhengxu',
-					'dcbeifen',
-					'nifu',
-					'fuqi',
-					'refuqi',
-					'rewenji',
-					'xinhongyan',
-					'rejuece',
-					'xiaoxi_hansui',
-					'xinjyzongshi',
-					'rezongshi',
-					'yingjian',
-					'rongbei',
-					'fengjie',
-					'spyinju',
-					'twqiaosi',
-					'twrouke',
-					'twzhenliang',
-					'twkuanji',
-					'twchungang',
-					'zhenshan',
-					'twxiangyu',
-					'zhengfu',
-					'dcfaqi',
-					'psguanxing',
-					'shushen',
-					'stdshushen',
-					'dcshushen',
-					'spshude',
-					'yjxuepin',
-					'vtbyanli',
-					'yjzhenlve',
-					'zhenlue',
-					'jsrgshenchong',
-					'jie',
-					'jsrgzhenqiao',
-					'jsrgxundao',
-					'jsrgzhiheng',
-					'jsrgguanjue',
-					'jsrgguiji',
-					'liangji',
-					'dddxuyu',
-					'nslingying',
-					'nsfuge',
-					'nszhenyin',
-					'yuiko_fenglun',
-					'fuhun',
-					'yanxiao',
-					'fuji',
-					'sptaoluan',
-					'xinfu_limu',
-					'xuxie',
-					'xfenxin',
-					'xianwei',
-					'dcliying',
-				];
-				game.saveExtensionConfig('大乱斗', 'common', common);
-				game.saveExtensionConfig('大乱斗', 'group', common);
-				alert('157的常驻技能池配置已成功载入！这些技能将不会加入技能审批');
-			} else game.saveExtensionConfig('大乱斗', 'nrsc', 0);
-		}
-		if (lib.config.extension_大乱斗_tempCache !== 'checkMerged' && lib.config.extension_大乱斗_filterSkills > 0) {
+		if (lib.config.extension_大乱斗_filterSkills > 0) {
 			let configs = [];
 			if (
 				lib.config.extension_大乱斗_common.some((i) => {
@@ -578,7 +313,6 @@ export function precontent(config, pack) {
 					game.saveExtensionConfig('大乱斗', 'check', lib.config.extension_大乱斗_check);
 				}
 			}
-			game.saveExtensionConfig('大乱斗', 'tempCache', 'checkMerged');
 		}
 		if (get.mode() === 'guozhan') return;
 		_status.daluandou_characters = {};
@@ -702,7 +436,7 @@ export function precontent(config, pack) {
 		},
 		filter(event, player) {
 			if (player !== game.me) return false;
-			if (event.name === 'washCard') return lib.config.extension_大乱斗_addSkill;
+			if (event.washCard) return lib.config.extension_大乱斗_addSkill;
 			return true;
 		},
 		forced: true,
@@ -966,7 +700,7 @@ export function precontent(config, pack) {
 			global: ['gameStart', 'washCard'],
 		},
 		filter(event, player) {
-			if (event.name === 'washCard') return lib.config.extension_大乱斗_addSkill;
+			if (event.washCard) return lib.config.extension_大乱斗_addSkill;
 			return true;
 		},
 		silent: true,
@@ -1156,7 +890,6 @@ export function precontent(config, pack) {
 					target.storage.dld.tret += 2 * (result.max - skills.length);
 				}
 				if (!skills.length) continue;
-				target.popup(skills);
 				await target.addSkills(skills);
 				if (lib.config.extension_大乱斗_allotSkills === 'off') continue;
 				let names = [],
@@ -1420,7 +1153,6 @@ export function precontent(config, pack) {
 				if (!target || !result) continue;
 				let skills = result.links;
 				if (!skills.length) continue;
-				target.popup(skills);
 				await target.addSkills(skills);
 				if (lib.config.extension_大乱斗_allotSkills === 'off') continue;
 				let names = [],
@@ -1558,7 +1290,6 @@ export function precontent(config, pack) {
 					)
 					.forResult();
 			else return;
-			player.popup(result.control);
 			await player.addSkills(result.control);
 			player.removeSkill('dld_zhuBuff');
 			if (lib.character[player.name1]) {
@@ -1712,7 +1443,6 @@ export function precontent(config, pack) {
 					)
 					.forResult();
 			if (result && result.control) {
-				player.popup(result.control);
 				await target.removeSkills(result.control);
 			}
 			await game.delay();
