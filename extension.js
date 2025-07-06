@@ -1,5 +1,5 @@
-//game.import(name:"大乱斗"
-import { lib, game, ui, get, ai, _status } from '../../noname.js';
+import { lib, game, ui, get, ai, _status } from './js/utils.js';
+import { arenaReady } from './js/arenaReady.js';
 import { config } from './js/config.js';
 import { precontent } from './js/precontent.js';
 
@@ -7,7 +7,8 @@ const extensionInfo = await lib.init.promises.json(`${lib.assetURL}extension/大
 let extensionPackage = {
 	name: '大乱斗',
 	content: () => {},
-	precontent: precontent,
+	precontent,
+	arenaReady,
 	config: config,
 	help: {},
 	package: {},
