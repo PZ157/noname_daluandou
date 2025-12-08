@@ -2,27 +2,24 @@ import { lib, game, ui, get, ai, _status } from './utils.js';
 
 export function precontent(config, pack) {
 	{
-		let min = [17],
+		let min = [10, 17],
 			noname = lib.version
 				.split('.')
-				.slice(2)
+				.slice(1)
 				.map((i) => Number(i)),
 			status = false;
 		while (noname.length < min.length) {
 			noname.push(0);
 		}
-		if (lib.version.slice(0, 5) === '1.10.') {
-			for (let i = 0; i < min.length; i++) {
-				if (noname[i] < min[i]) {
-					status = '您的无名杀版本太低';
-					break;
-				}
-				if (noname[i] > min[i]) {
-					break;
-				}
+		for (let i = 0; i < min.length; i++) {
+			if (noname[i] < min[i]) {
+				status = '您的无名杀版本太低';
+				break;
+			}
+			if (noname[i] > min[i]) {
+				break;
 			}
 		}
-		else status = '检测到游戏大版本号与本扩展支持的版本号不同';
 		if (typeof status === 'string') {
 			alert(status + '，为避免版本不兼容产生不必要的问题，已为您关闭『大乱斗』扩展，稍后自动重启游戏');
 			game.saveExtensionConfig('大乱斗', 'enable', false);
@@ -35,15 +32,10 @@ export function precontent(config, pack) {
 				ui.joint`
 					<center>
 						<span style="color: #00FFFF">更新日期</span>：
-						2025年<span style="color: #00FFB0">3</span>月<span style="color: #FF0000">29</span>日
+						2025年<span style="color: #00FFB0">12</span>月<span style="color: #FF0000">7</span>日
 					</center>
 				`,
-				'◆修复鏖战不受［鏖战］开关限制的严重问题',
-				'◆修复大乱斗中的添加/移除技能会显示两遍的问题',
-				'◆移除内置的过时的常驻技能池并默认关闭常驻技能候选',
-				'◆开启［技能审批］后会检查并提示玩家将已加入特殊技能池的技能标记为已批阅技能',
-				'◆更新自定义方法game.copy',
-				'◆模块拆分',
+				'◆适配最新版本',
 			];
 			let ul = document.createElement('ul');
 			ul.style.textAlign = 'left';
@@ -1322,8 +1314,13 @@ export function precontent(config, pack) {
 									if (_status.dld_config.tret.includes(skills[i])) less.add(skills[i]);
 									else normal.add(skills[i]);
 								} else if (info.ai.combo) {
-									if (!target.hasSkill(info.ai.combo, null, null, false)) less.add(skills[i]);
-									else if (!good.includes(info.ai.combo)) good.add(info.ai.combo);
+									const combo = Array.isArray(info.ai.combo) ? info.ai.combo : [info.ai.combo];
+									if (combo.some(s => {
+										return !target.hasSkill(s, null, null, false);
+									})) less.add(skills[i]);
+									else if (combo.some(s => {
+										return !good.includes(s);
+									})) good.addArray(combo);
 									else normal.add(skills[i]);
 								} else if (info.ai.neg);
 								else if (info.ai.halfneg) half.add(skills[i]);
