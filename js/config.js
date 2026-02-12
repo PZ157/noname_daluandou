@@ -147,59 +147,29 @@ export let config = {
 		name: '开局执行函数（<font color=#FF0000>新手慎用！</font>）',
 		clear: true,
 		onclick() {
-			let container = ui.create.div('.popup-container.editor'),
-				node = container,
-				config =
-					lib.config.extension_大乱斗_ief ||
-					game.dedent`
-						func = async function (player, configs) {
-							
-						};
-					`;
-			node.code = config;
-			ui.window.classList.add('shortcutpaused');
-			ui.window.classList.add('systempaused');
-			let saveInput = function () {
-				let code, func;
-				if (container.editor) code = container.editor.getValue();
-				else if (container.textarea) code = container.textarea.value;
-				try {
-					eval(code);
-					if (Object.prototype.toString.call(func) !== '[object AsyncFunction]') throw 'typeError';
-				} catch (e) {
-					if (e === 'typeError') alert('类型不为[object AsyncFunction]，请勿修改原结构');
-					else alert('代码语法有错误，请仔细检查（' + e + '）');
-					return;
+			const config = lib.config.extension_大乱斗_ief || game.dedent`
+				func = async function (player, configs) {
+					
+				};
+			`;
+
+			ui.create.editor({
+				language: "javascript",
+				value: config,
+				saveInput: (code) => {
+					try {
+						eval(code);
+						if (typeof func !== 'function' || 
+							Object.prototype.toString.call(func) !== '[object AsyncFunction]') {
+							throw new Error('类型不为[object AsyncFunction]，请勿修改原结构');
+						}
+						game.saveExtensionConfig('大乱斗', 'ief', code);
+					} catch (e) {
+						if (e.message && e.message.includes('类型不为')) throw e;
+						throw new Error('代码语法有错误，请仔细检查（' + e + '）');
+					}
 				}
-				game.saveExtensionConfig('大乱斗', 'ief', code);
-				ui.window.classList.remove('shortcutpaused');
-				ui.window.classList.remove('systempaused');
-				container.delete();
-				container.code = code;
-				delete window.saveNonameInput;
-			};
-			window.saveNonameInput = saveInput;
-			let editor = ui.create.editor(container, saveInput);
-			if (node.aced) {
-				ui.window.appendChild(node);
-				node.editor.setValue(node.code, 1);
-			} else if (lib.device === 'ios') {
-				ui.window.appendChild(node);
-				if (!node.textarea) {
-					let textarea = document.createElement('textarea');
-					editor.appendChild(textarea);
-					node.textarea = textarea;
-					lib.setScroll(textarea);
-				}
-				node.textarea.value = node.code;
-			} else {
-				if (!window.CodeMirror) {
-					import('../../../game/codemirror.js').then(() => {
-						lib.codeMirrorReady(node, editor);
-					});
-					lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
-				} else lib.codeMirrorReady(node, editor);
-			}
+			});
 		},
 	},
 	skillAI: {
@@ -409,57 +379,28 @@ export let config = {
 		name: '载入本扩展配置',
 		clear: true,
 		onclick() {
-			let container = ui.create.div('.popup-container.editor');
-			let node = container;
 			let str = '//完整粘贴你保存的『大乱斗』配置到等号右端\r_status.dld_config = ';
-			node.code = str;
-			ui.window.classList.add('shortcutpaused');
-			ui.window.classList.add('systempaused');
-			let saveInput = function () {
-				let code;
-				if (container.editor) code = container.editor.getValue();
-				else if (container.textarea) code = container.textarea.value;
-				try {
-					eval(code);
-					if (Object.prototype.toString.call(_status.dld_config) !== '[object Object]') throw 'typeError';
-				} catch (e) {
-					if (e === 'typeError') alert('类型错误');
-					else alert('代码语法有错误，请仔细检查（' + e + '）');
-					return;
+
+			ui.create.editor({
+				language: "javascript",
+				value: str,
+				saveInput: (code) => {
+					try {
+						eval(code);
+						if (Object.prototype.toString.call(_status.dld_config) !== '[object Object]') {
+							throw new Error('类型错误');
+						}
+						for (let i in _status.dld_config) {
+							game.saveConfig('extension_大乱斗_' + i, _status.dld_config[i]);
+						}
+						alert('配置已成功载入！即将重启游戏');
+						game.reload();
+					} catch (e) {
+						if (e.message && e.message.includes('类型错误')) throw e;
+						throw new Error('代码语法有错误，请仔细检查（' + e + '）');
+					}
 				}
-				for (let i in _status.dld_config) {
-					game.saveConfig('extension_大乱斗_' + i, _status.dld_config[i]);
-				}
-				ui.window.classList.remove('shortcutpaused');
-				ui.window.classList.remove('systempaused');
-				container.delete();
-				container.code = code;
-				delete window.saveNonameInput;
-				alert('配置已成功载入！即将重启游戏');
-				game.reload();
-			};
-			window.saveNonameInput = saveInput;
-			let editor = ui.create.editor(container, saveInput);
-			if (node.aced) {
-				ui.window.appendChild(node);
-				node.editor.setValue(node.code, 1);
-			} else if (lib.device === 'ios') {
-				ui.window.appendChild(node);
-				if (!node.textarea) {
-					let textarea = document.createElement('textarea');
-					editor.appendChild(textarea);
-					node.textarea = textarea;
-					lib.setScroll(textarea);
-				}
-				node.textarea.value = node.code;
-			} else {
-				if (!window.CodeMirror) {
-					import('../../../game/codemirror.js').then(() => {
-						lib.codeMirrorReady(node, editor);
-					});
-					lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
-				} else lib.codeMirrorReady(node, editor);
-			}
+			});
 		},
 	},
 	bd2: {

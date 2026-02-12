@@ -2,7 +2,7 @@ import { lib, game, ui, get, ai, _status } from './utils.js';
 
 export function precontent(config, pack) {
 	{
-		let min = [10, 17],
+		let min = [11, 1],
 			noname = lib.version
 				.split('.')
 				.slice(1)
@@ -32,7 +32,7 @@ export function precontent(config, pack) {
 				ui.joint`
 					<center>
 						<span style="color: #00FFFF">更新日期</span>：
-						2025年<span style="color: #00FFB0">12</span>月<span style="color: #FF0000">7</span>日
+						2026年<span style="color: #00FFB0">2</span>月<span style="color: #FF0000">12</span>日
 					</center>
 				`,
 				'◆适配最新版本',
